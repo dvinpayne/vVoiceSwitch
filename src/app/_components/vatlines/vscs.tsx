@@ -850,16 +850,16 @@ function VikKeypad() {
   // Determine call type prompt based on first digit
   const getCallTypePrompt = (firstDigit: string): string => {
     switch (firstDigit) {
-      case '0': return VIK_MESSAGES.IC_CALL;       // Intercom call within facility
-      case '1': return VIK_MESSAGES.DIAL_CODE;    // PABX - external phone network
-      case '3': return VIK_MESSAGES.MEET_ME_CALL; // Meet-Me conference
-      case '4': return VIK_MESSAGES.IP_CALL;      // Interphone call to other facility
-      case '5': return VIK_MESSAGES.OVR_CALL;     // Override - Tracker position
-      case '6': return VIK_MESSAGES.OVR_CALL;     // Override - Assistant position
-      case '7': return VIK_MESSAGES.OVR_CALL;     // Override - Data position
-      case '8': return VIK_MESSAGES.OVR_CALL;     // Override - Radar position
-      case '9': return VIK_MESSAGES.OVR_CALL;     // Override - Coordinator position
-      case '2': return VIK_MESSAGES.OVR_CALL;     // Override - Non-ATC position
+      case '0': return VIK_MESSAGES.DIAL_CODE;    // PABX line
+      case '1': return VIK_MESSAGES.IP_CALL;      // Inter-phone trunk
+      case '2': return VIK_MESSAGES.OVR_CALL;     // Override - A-Side
+      case '3': return VIK_MESSAGES.OVR_CALL;     // Override - D-Side
+      case '4': return VIK_MESSAGES.OVR_CALL;     // Override - Tracker
+      case '5': return VIK_MESSAGES.OVR_CALL;     // Override - Ancillary (MOS/TMU/CWSU/FDCS/NOM/STMC)
+      case '6': return VIK_MESSAGES.OVR_CALL;     // Override - Coordinator
+      case '7': return VIK_MESSAGES.OVR_CALL;     // Override - R-Side
+      case '8': return VIK_MESSAGES.IC_CALL;      // Intercom - ring pos. in-house
+      case '9': return VIK_MESSAGES.MEET_ME_CALL; // Meet-Me conference
       case '*': return VIK_MESSAGES.SPEED_DIAL;   // Speed dial function
       default: return VIK_MESSAGES.DIAL_CODE;
     }
@@ -873,9 +873,9 @@ function VikKeypad() {
     const firstDigit = buffer[0];
     const targetCode = buffer.substring(1);
     
-    // Override calls (5,6,7,8,9,2): ss(s) format - 2-3 digits for sector
+    // Override calls (2,3,4,5,6,7): ss(s) format - 2-3 digits for sector
     // Auto-initiate when we have a valid line match
-    if (['5', '6', '7', '8', '9', '2'].includes(firstDigit || '')) {
+    if (['2', '3', '4', '5', '6', '7'].includes(firstDigit || '')) {
       // Try to find matching line - if found, auto-initiate
       const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_OVERRIDE);
       if (lineId) return true;
@@ -883,24 +883,24 @@ function VikKeypad() {
       if (targetCode.length >= 3) return true;
     }
     
-    // IC calls (0): Check for line match
-    if (firstDigit === '0' && targetCode.length >= 2) {
+    // IC calls (8): Check for line match
+    if (firstDigit === '8' && targetCode.length >= 2) {
       const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_RING);
       if (lineId) return true;
       if (targetCode.length >= 3) return true;
     }
     
-    // IP calls (4): ddd format - 3 digits
-    if (firstDigit === '4' && targetCode.length >= 3) {
+    // IP/Inter-phone calls (1): ddd format - 3 digits
+    if (firstDigit === '1' && targetCode.length >= 3) {
       return true;
     }
     
-    // Meet-Me (3): ddd format - 3 digits
-    if (firstDigit === '3' && targetCode.length >= 3) {
+    // Meet-Me (9): ddd format - 3 digits
+    if (firstDigit === '9' && targetCode.length >= 3) {
       return true;
     }
     
-    // PABX (1): Variable length - need # to confirm, don't auto-initiate
+    // PABX (0): Variable length - need # to confirm, don't auto-initiate
     
     return false;
   };
@@ -958,7 +958,7 @@ function VikKeypad() {
       }, 2000);
     };
     
-    if (['5', '6', '7', '8', '9', '2'].includes(firstDigit)) {
+    if (['2', '3', '4', '5', '6', '7'].includes(firstDigit)) {
       // Override call
       const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_OVERRIDE);
       
@@ -976,25 +976,8 @@ function VikKeypad() {
           setKeysIlluminated(false);
         }, 2000);
       }
-    } else if (firstDigit === '0') {
-      // IC call
-      const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_RING);
-      
-      if (lineId) {
-        initiateCallWithTimeout(lineId, dialBuffer, 1);
-      } else {
-        setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
-        setDisplayLine2(dialBuffer);
-        setTimeout(() => {
-          setDisplayLine1('');
-          setDisplayLine2('');
-          setDialBuffer('');
-          setCallState('idle');
-          setKeysIlluminated(false);
-        }, 2000);
-      }
-    } else if (firstDigit === '4') {
-      // IP call
+    } else if (firstDigit === '8') {
+      // IC call - Intercom ring in-house
       const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_RING);
       
       if (lineId) {
@@ -1011,6 +994,23 @@ function VikKeypad() {
         }, 2000);
       }
     } else if (firstDigit === '1') {
+      // IP / Inter-phone trunk call
+      const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_RING);
+      
+      if (lineId) {
+        initiateCallWithTimeout(lineId, dialBuffer, 1);
+      } else {
+        setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
+        setDisplayLine2(dialBuffer);
+        setTimeout(() => {
+          setDisplayLine1('');
+          setDisplayLine2('');
+          setDialBuffer('');
+          setCallState('idle');
+          setKeysIlluminated(false);
+        }, 2000);
+      }
+    } else if (firstDigit === '0') {
       // PABX call
       setDisplayLine1(VIK_MESSAGES.DIALING_COMPLETE);
       setDisplayLine2(dialBuffer);
@@ -1028,7 +1028,7 @@ function VikKeypad() {
           return currentState;
         });
       }, 2000);
-    } else if (firstDigit === '3') {
+    } else if (firstDigit === '9') {
       // Meet-Me conference
       setDisplayLine1(VIK_MESSAGES.CALL_RINGING);
       setDisplayLine2(dialBuffer);
@@ -1138,9 +1138,9 @@ function VikKeypad() {
       // Keep the call active, don't release
     } else if (callState === 'dialing' && dialBuffer.length >= 2) {
       // Manual initiation for PABX calls that need # or explicit INIT
-      // Most calls auto-initiate, but PABX (1xxx) requires explicit confirmation
+      // Most calls auto-initiate, but PABX (0xxx) requires explicit confirmation
       const firstDigit = dialBuffer[0] || '';
-      if (firstDigit === '1') {
+      if (firstDigit === '0') {
         // PABX call - initiate on INIT press
         initiateCall();
       }
@@ -1160,11 +1160,13 @@ function VikKeypad() {
         const firstDigit = dialBuffer[0] || '';
         let dbl1 = 2; // Default
         let isShoutOverride = false;
-        if (['5', '6', '7', '8', '9', '2'].includes(firstDigit)) {
+        if (['2', '3', '4', '5', '6', '7'].includes(firstDigit)) {
           dbl1 = 1; // Override (SO lines use dbl1: 1)
           isShoutOverride = true;
-        } else if (firstDigit === '0' || firstDigit === '4') {
+        } else if (firstDigit === '8' || firstDigit === '1') {
           dbl1 = 2; // IC/IP ring
+        } else if (firstDigit === '9') {
+          dbl1 = 3; // Meet-Me
         }
         
         // Search gg_status to find the actual call_id to use for release
