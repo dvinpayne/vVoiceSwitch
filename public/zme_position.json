@@ -1,4 +1,6 @@
 {
+  "id": "ZME",
+  "name": "Memphis ARTCC",
   "positions": [
     {
       "cs": "MEM_41_CTR",
@@ -31,7 +33,8 @@
         ["912733", 2, "GLH"],
         ["912735", 2, "GWO"],
         ["912739", 2, "PAH"],
-        ["912741", 2, "CGI"]
+        ["912741", 2, "CGI"],
+        ["6150740", 2, "41"]
       ]
     },
     {
@@ -98,7 +101,8 @@
         ["912733", 2, "GLH"],
         ["912735", 2, "GWO"],
         ["912739", 2, "PAH"],
-        ["912741", 2, "CGI"]
+        ["912741", 2, "CGI"],
+        ["6150740", 2, "63"]
       ]
     },
     {
@@ -478,8 +482,7 @@
       "freq": 126850000,
       "rn": "Memphis Center",
       "ui": "vscs",
-      "lines": [
-      ]
+      "lines": []
     },
     {
       "cs": "MEM_15_CTR",
@@ -990,7 +993,8 @@
         ["912733", 2, "GLH"],
         ["912735", 2, "GWO"],
         ["912739", 2, "PAH"],
-        ["912741", 2, "CGI"]
+        ["912741", 2, "CGI"],
+        ["6150740", 2, "22"]
       ]
     },
     {
@@ -1300,10 +1304,12 @@
   ],
   "childFacilities": [
     {
+      "id": "M03",
+      "name": "Memphis TRACON",
       "positions": [
         {
           "cs": "MEM_E_APP",
-          "pos": "Arrival Radar East",
+          "pos": "ARE",
           "freq": 125800000,
           "rn": "Memphis Approach",
           "ui": "ivsr",
@@ -1314,62 +1320,45 @@
             ["9010707", 0, "ARF OVR"],
             ["9010708", 0, "DRV OVR"],
             ["9010709", 0, "DRA OVR"],
-            
             ["912601", 2, "ZME"],
             ["912701", 0, "LC-2 OVR"],
             ["912711", 2, "NQA"],
             ["912713", 2, "OLV"]
-          ],
-          "lines_obj": {
-            "912601": 1,
-            "912701": 1,
-            "912711": 1,
-            "912713": 1
-          }
+          ]
         },
         {
           "cs": "MEM_W_APP",
-          "pos": "Arrival Radar West",
+          "pos": "ARW",
           "freq": 119100000,
           "rn": "Memphis Approach",
           "ui": "ivsr",
           "lines": [
-            ["9010704", 0, "Arriva"],
-            ["9010710", 0, "Final "],
-            ["9010711", 0, "Final "],
-            ["9010712", 0, "Final "],
-            ["9010713", 0, "Depart"],
-            ["9010714", 0, "Depart"],
+            ["9010704", 0, "ARE OVR"],
+            ["9010710", 0, "ARM OVR"],
+            ["9010711", 0, "ARF OVR"],
+            ["9010712", 0, "ARN OVR"],
+            ["9010713", 0, "DRV OVR"],
+            ["9010714", 0, "DRA OVR"],
             ["912601", 2, "ZME"],
-            ["912701", 2, "MEM"],
             ["912711", 2, "NQA"],
             ["912713", 2, "OLV"]
-          ],
-          "lines_obj": {
-            "912601": 1,
-            "912701": 1,
-            "912711": 1,
-            "912713": 1
-          }
+          ]
         },
         {
           "cs": "MEM_V_DEP",
-          "pos": "Departure Radar East",
+          "pos": "DRV",
           "freq": 124150000,
           "rn": "Memphis Departure",
           "ui": "ivsr",
           "lines": [
-            ["9010708", 0, "Arriva"],
-            ["9010713", 0, "Arriva"],
-            ["9010717", 0, "Final "],
-            ["9010720", 0, "Final "],
-            ["9010722", 0, "Final "],
-            ["9010724", 0, "Depart"],
+            ["9010708", 0, "ARE OVR"],
+            ["9010713", 0, "ARW OVR"],
+            ["9010717", 0, "ARM OVR"],
+            ["9010720", 0, "ARF OVR"],
+            ["9010722", 0, "ARN OVR"],
+            ["9010724", 0, "DRA OVR"],
             ["912602", 2, "ZME"]
-          ],
-          "lines_obj": {
-            "912602": 1
-          }
+          ]
         },
         {
           "cs": "MEM_A_DEP",
@@ -1378,33 +1367,29 @@
           "rn": "Memphis Departure",
           "ui": "ivsr",
           "lines": [
-            ["9010709", 0, "Arriva"],
-            ["9010714", 0, "Arriva"],
-            ["9010718", 0, "Final "],
-            ["9010721", 0, "Final "],
-            ["9010723", 0, "Final "],
-            ["9010724", 0, "Depart"],
+            ["9010709", 0, "ARE OVR"],
+            ["9010714", 0, "ARW OVR"],
+            ["9010718", 0, "ARM OVR"],
+            ["9010721", 0, "ARN OVR"],
+            ["9010723", 0, "ARF OVR"],
+            ["9010724", 0, "DRV OVR"],
             ["912602", 2, "ZME"]
-          ],
-          "lines_obj": {
-            "912602": 1
-          }
+          ]
         },
         {
           "cs": "MEM_M_APP",
-          "pos": "Final East",
+          "pos": "ARM",
           "freq": 120925000,
           "rn": "Memphis Approach",
           "ui": "ivsr",
           "lines": [
-            ["9010705", 0, "Arriva"],
-            ["9010710", 0, "Arriva"],
-            ["9010715", 0, "Final "],
-            ["9010716", 0, "Final "],
-            ["9010717", 0, "Depart"],
-            ["9010718", 0, "Depart"],
+            ["9010705", 0, "ARE OVR"],
+            ["9010710", 0, "ARW OVR"],
+            ["9010715", 0, "ARN OVR"],
+            ["9010716", 0, "ARF OVR"],
+            ["9010717", 0, "DRV OVR"],
+            ["9010718", 0, "DRA OVR"],
             ["912601", 2, "ZME"],
-            ["912701", 2, "MEM"],
             ["912711", 2, "NQA"],
             ["912713", 2, "OLV"]
           ]
@@ -1416,14 +1401,13 @@
           "rn": "Memphis Approach",
           "ui": "ivsr",
           "lines": [
-            ["9010706", 0, "Arriva"],
-            ["9010711", 0, "Arriva"],
-            ["9010715", 0, "Final "],
-            ["9010719", 0, "Final "],
-            ["9010720", 0, "Depart"],
-            ["9010721", 0, "Depart"],
+            ["9010706", 0, "ARE OVR"],
+            ["9010711", 0, "ARW OVR"],
+            ["9010715", 0, "ARM OVR"],
+            ["9010719", 0, "ARF OVR"],
+            ["9010720", 0, "DRV OVR"],
+            ["9010721", 0, "DRA OVR"],
             ["912601", 2, "ZME"],
-            ["912701", 2, "MEM"],
             ["912711", 2, "NQA"],
             ["912713", 2, "OLV"]
           ]
@@ -1435,26 +1419,24 @@
           "rn": "Memphis Approach",
           "ui": "ivsr",
           "lines": [
-            ["9010707", 0, "Arriva"],
-            ["9010712", 0, "Arriva"],
-            ["9010716", 0, "Final "],
-            ["9010719", 0, "Final "],
-            ["9010722", 0, "Depart"],
-            ["9010723", 0, "Depart"],
+            ["9010707", 0, "ARE OVR"],
+            ["9010712", 0, "ARW OVR"],
+            ["9010716", 0, "ARM OVR"],
+            ["9010719", 0, "ARN OVR"],
+            ["9010722", 0, "DRV OVR"],
+            ["9010723", 0, "DRA OVR"],
             ["912601", 2, "ZME"],
-            ["912701", 2, "MEM"],
             ["912711", 2, "NQA"],
             ["912713", 2, "OLV"]
           ]
         },
         {
           "cs": "MEM_SI_APP",
-          "pos": "Supervisor",
+          "pos": "SI",
           "freq": 121500000,
           "rn": "TRACON Supervisor",
           "ui": "ivsr",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         },
         {
           "cs": "M03_U_APP",
@@ -1467,19 +1449,20 @@
       ],
       "childFacilities": [
         {
+          "id": "MEM",
+          "name": "Memphis ATCT",
           "positions": [
             {
               "cs": "MEM_DEL",
-              "pos": "Clearance",
+              "pos": "CD",
               "freq": 125200000,
               "rn": "Memphis Clearance",
               "ui": "ivsr",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             },
             {
               "cs": "MEM_1_GND",
-              "pos": "Ground 1",
+              "pos": "GC1",
               "freq": 121650000,
               "rn": "Memphis Ground",
               "ui": "ivsr",
@@ -1487,7 +1470,7 @@
             },
             {
               "cs": "MEM_2_GND",
-              "pos": "Ground 2",
+              "pos": "GC2",
               "freq": 121900000,
               "rn": "Memphis Ground",
               "ui": "ivsr",
@@ -1495,7 +1478,7 @@
             },
             {
               "cs": "MEM_3_GND",
-              "pos": "Ground 3",
+              "pos": "GC3",
               "freq": 121000000,
               "rn": "Memphis Ground",
               "ui": "ivsr",
@@ -1503,37 +1486,29 @@
             },
             {
               "cs": "MEM_1_TWR",
-              "pos": "Local 1",
+              "pos": "LC1",
               "freq": 128425000,
               "rn": "Memphis Tower",
               "ui": "ivsr",
               "lines": [
                 ["912701", 2, "M03"],
                 ["912702", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912701": 1,
-                "912702": 1
-              }
+              ]
             },
             {
               "cs": "MEM_2_TWR",
-              "pos": "Local 2",
+              "pos": "LC2",
               "freq": 119700000,
               "rn": "Memphis Tower",
               "ui": "ivsr",
               "lines": [
                 ["912701", 2, "M03"],
                 ["912702", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912701": 1,
-                "912702": 1
-              }
+              ]
             },
             {
               "cs": "MEM_N_TWR",
-              "pos": "Local 3",
+              "pos": "LC3",
               "freq": 118300000,
               "rn": "Memphis Tower",
               "ui": "ivsr",
@@ -1543,114 +1518,97 @@
               ]
             }
           ],
-          "childFacilities": [],
-          "name": "Memphis ATCT",
-          "id": "MEM"
+          "childFacilities": []
         },
         {
+          "id": "OLV",
+          "name": "Olive Branch ATCT",
           "positions": [
             {
               "cs": "OLV_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121200000,
               "rn": "Olive Branch Ground",
               "ui": "etvs",
-              "lines": [["912714", 0, "LC"]],
-              "lines_obj": {
-                "912714": 1
-              }
+              "lines": [["912714", 0, "LC"]]
             },
             {
               "cs": "OLV_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 125275000,
               "rn": "Olive Branch Tower",
               "ui": "etvs",
               "lines": [
                 ["912713", 2, "M03"],
                 ["912714", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912713": 1,
-                "912714": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Olive Branch ATCT",
-          "id": "OLV"
+          "childFacilities": []
         },
         {
+          "id": "NQA",
+          "name": "Millington ATCT",
           "positions": [
             {
               "cs": "NQA_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121375000,
               "rn": "Millington Ground",
               "ui": "lstar",
-              "lines": [["912712", 0, "LC"]],
-              "lines_obj": {
-                "912712": 1
-              }
+              "lines": [["912712", 0, "LC"]]
             },
             {
               "cs": "NQA_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 120250000,
               "rn": "Millington Tower",
               "ui": "lstar",
               "lines": [
                 ["912711", 2, "M03"],
                 ["912712", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912711": 1,
-                "912712": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Millington ATCT",
-          "id": "NQA"
+          "childFacilities": []
         }
-      ],
-      "name": "Memphis TRACON",
-      "id": "M03"
+      ]
     },
     {
+      "id": "BNA",
+      "name": "Nashville ATCT/TRACON",
       "positions": [
         {
           "cs": "BNA_E_APP",
-          "pos": "Arrival Radar East",
+          "pos": "ARE",
           "freq": 127175000,
           "rn": "Nashville Approach",
           "ui": "etvs",
           "lines": [
-            ["9010704", 0, "Arriva"],
-            ["6150725", 0, "Final "],
-            ["6150726", 0, "Final "],
-            ["6150727", 0, "Satell"],
-            ["9010709", 0, "Depart"],
-            ["9010708", 0, "Depart"],
+            ["9010704", 0, "ARE OVR"],
+            ["6150725", 0, "FRE OVR"],
+            ["6150726", 0, "FRW OVR"],
+            ["6150727", 0, "SRE OVR"],
+            ["9010709", 0, "DRW OVR"],
+            ["9010708", 0, "DRE OVR"],
             ["912603", 2, "ZME"],
-            ["912703", 2, "BNA"],
             ["912715", 2, "JWN"],
             ["912717", 2, "MQY"]
           ]
         },
         {
           "cs": "BNA_W_APP",
-          "pos": "Arrival Radar West",
+          "pos": "ARW",
           "freq": 120600000,
           "rn": "Nashville Approach",
           "ui": "etvs",
           "lines": [
-            ["9010704", 0, "Arriva"],
-            ["6150728", 0, "Final "],
-            ["6150729", 0, "Final "],
-            ["6150730", 0, "Satell"],
-            ["9010714", 0, "Depart"],
-            ["9010713", 0, "Depart"],
+            ["9010704", 0, "ARE OVR"],
+            ["6150728", 0, "FRE OVR"],
+            ["6150729", 0, "FRW OVR"],
+            ["6150730", 0, "SRE OVR"],
+            ["9010714", 0, "DRW OVR"],
+            ["9010713", 0, "DRE OVR"],
             ["912603", 2, "ZME"],
             ["912703", 2, "BNA"],
             ["912715", 2, "JWN"],
@@ -1663,73 +1621,71 @@
           "freq": 126050000,
           "rn": "Nashville Clearance",
           "ui": "etvs",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         },
         {
           "cs": "BNA_Y_DEP",
-          "pos": "Departure Radar East",
+          "pos": "DRE",
           "freq": 118400000,
           "rn": "Nashville Departure",
           "ui": "etvs",
           "lines": [
-            ["9010708", 0, "Arriva"],
-            ["9010713", 0, "Arriva"],
-            ["6150734", 0, "Final "],
-            ["6150737", 0, "Final "],
-            ["6150739", 0, "Satell"],
-            ["9010724", 0, "Depart"],
+            ["9010708", 0, "ARE OVR"],
+            ["9010713", 0, "ARW OVR"],
+            ["6150734", 0, "FRE OVR"],
+            ["6150737", 0, "FRW OVR"],
+            ["6150739", 0, "SRE OVR"],
+            ["9010724", 0, "DRW OVR"],
             ["912604", 2, "ZME"]
           ]
         },
         {
           "cs": "BNA_X_DEP",
-          "pos": "Departure Radar West",
+          "pos": "DRW",
           "freq": 119350000,
           "rn": "Nashville Departure",
           "ui": "etvs",
           "lines": [
-            ["9010709", 0, "Arriva"],
-            ["9010714", 0, "Arriva"],
-            ["6150733", 0, "Final "],
-            ["6150736", 0, "Final "],
-            ["6150738", 0, "Satell"],
-            ["9010724", 0, "Depart"],
+            ["9010709", 0, "ARE OVR"],
+            ["9010714", 0, "ARE OVR"],
+            ["6150733", 0, "FRE OVR"],
+            ["6150736", 0, "FRW OVR"],
+            ["6150738", 0, "SRE OVR"],
+            ["9010724", 0, "DRE OVR"],
             ["912604", 2, "ZME"]
           ]
         },
         {
           "cs": "BNA_F_APP",
-          "pos": "Final Radar East",
+          "pos": "FRE",
           "freq": 124750000,
           "rn": "Nashville Approach",
           "ui": "etvs",
           "lines": [
-            ["6150725", 0, "Arriva"],
-            ["6150728", 0, "Arriva"],
-            ["6150731", 0, "Final "],
-            ["6150732", 0, "Satell"],
-            ["6150733", 0, "Depart"],
-            ["6150734", 0, "Depart"],
+            ["6150725", 0, "ARE OVR"],
+            ["6150728", 0, "ARW OVR"],
+            ["6150731", 0, "FRW OVR"],
+            ["6150732", 0, "SRE OVR"],
+            ["6150733", 0, "DRW OVR"],
+            ["6150734", 0, "DRE OVR"],
             ["912603", 2, "ZME"],
-            ["912703", 2, "BNA"],
             ["912715", 2, "JWN"],
             ["912717", 2, "MQY"]
           ]
         },
         {
           "cs": "BNA_B_APP",
-          "pos": "Final Radar West",
+          "pos": "FRW",
           "freq": 133000000,
           "rn": "Nashville Approach",
           "ui": "etvs",
           "lines": [
-            ["6150726", 0, "Arriva"],
-            ["6150729", 0, "Arriva"],
-            ["6150731", 0, "Final "],
-            ["6150735", 0, "Satell"],
-            ["6150736", 0, "Depart"],
-            ["6150737", 0, "Depart"],
+            ["6150726", 0, "ARE OVR"],
+            ["6150729", 0, "ARW OVR"],
+            ["6150731", 0, "FRE OVR"],
+            ["6150735", 0, "SRE OVR"],
+            ["6150736", 0, "DRW OVR"],
+            ["6150737", 0, "DRE OVR"],
             ["912603", 2, "ZME"],
             ["912703", 2, "BNA"],
             ["912715", 2, "JWN"],
@@ -1738,50 +1694,42 @@
         },
         {
           "cs": "BNA_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121900000,
-          "rn": "Nashville Ground",
+          "rn": "GC",
           "ui": "etvs",
-          "lines": [["912704", 0, "LC"]],
-          "lines_obj": {
-            "912704": 1
-          }
+          "lines": [["912704", 0, "LC"]]
         },
         {
           "cs": "BNA_1_TWR",
-          "pos": "Local 1",
+          "pos": "LC1",
           "freq": 118600000,
           "rn": "Nashville Tower",
           "ui": "etvs",
-          "lines": [
-            ["912704", 0, "GC"]
-          ]
+          "lines": [["912704", 0, "GC"]]
         },
         {
           "cs": "BNA_2_TWR",
-          "pos": "Local 2",
+          "pos": "LC2",
           "freq": 132350000,
           "rn": "Nashville Tower",
           "ui": "etvs",
-          "lines": [
-            ["912704", 0, "GC"]
-          ]
+          "lines": [["912704", 0, "GC"]]
         },
         {
           "cs": "BNA_S_APP",
-          "pos": "Satellite Radar East",
+          "pos": "SRE",
           "freq": 128750000,
           "rn": "Nashville Approach",
           "ui": "etvs",
           "lines": [
-            ["6150727", 0, "Arriva"],
-            ["6150730", 0, "Arriva"],
-            ["6150732", 0, "Final "],
-            ["6150735", 0, "Final "],
-            ["6150738", 0, "Depart"],
-            ["6150739", 0, "Depart"],
+            ["6150727", 0, "ARE OVR"],
+            ["6150730", 0, "ARW OVR"],
+            ["6150732", 0, "FRE OVR"],
+            ["6150735", 0, "FRW OVR"],
+            ["6150738", 0, "DRW OVR"],
+            ["6150739", 0, "DRE OVR"],
             ["912603", 2, "ZME"],
-            ["912703", 2, "BNA"],
             ["912715", 2, "JWN"],
             ["912717", 2, "MQY"]
           ]
@@ -1792,94 +1740,74 @@
           "freq": 121500000,
           "rn": "Supervisor",
           "ui": "etvs",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         }
       ],
       "childFacilities": [
         {
+          "id": "MQY",
+          "name": "Smyrna ATCT",
           "positions": [
             {
               "cs": "MQY_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121400000,
               "rn": "Smyrna Ground",
               "ui": "lstar",
-              "lines": [["912718", 0, "LC"]],
-              "lines_obj": {
-                "912718": 1
-              }
+              "lines": [["912718", 0, "LC"]]
             },
             {
               "cs": "MQY_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 118500000,
               "rn": "Smryna Tower",
               "ui": "lstar",
-              "lines": [
-                ["912718", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912717": 1,
-                "912718": 1
-              }
+              "lines": [["912718", 0, "GC"]]
             }
           ],
-          "childFacilities": [],
-          "name": "Smyrna ATCT",
-          "id": "MQY"
+          "childFacilities": []
         },
         {
+          "id": "JWN",
+          "name": "John Tune ATCT",
           "positions": [
             {
               "cs": "JWN_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121700000,
               "rn": "John Tune Ground",
               "ui": "lstar",
-              "lines": [["912716", 0, "LC"]],
-              "lines_obj": {
-                "912716": 1
-              }
+              "lines": [["912716", 0, "LC"]]
             },
             {
               "cs": "JWN_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 119450000,
               "rn": "John Tune Tower",
               "ui": "lstar",
-              "lines": [
-                ["912716", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912715": 1,
-                "912716": 1
-              }
+              "lines": [["912716", 0, "GC"]]
             }
           ],
-          "childFacilities": [],
-          "name": "John Tune ATCT",
-          "id": "JWN"
+          "childFacilities": []
         }
-      ],
-      "name": "Nashville ATCT/TRACON",
-      "id": "BNA"
+      ]
     },
     {
+      "id": "LIT",
+      "name": "Little Rock ATCT/TRACON",
       "positions": [
         {
           "cs": "LIT_F_APP",
-          "pos": "Arrival Radar",
+          "pos": "AR",
           "freq": 135350000,
           "rn": "Little Rock Approach",
           "ui": "etvs",
           "lines": [
-            ["5010740", 0, "Radar "],
-            ["5010744", 0, "Radar "],
-            ["5010745", 0, "Radar "],
-            ["5010746", 0, "Radar "],
-            ["912605", 2, "ZME"],
-            ["912705", 2, "LIT"]
+            ["5010740", 0, "RW OVR"],
+            ["5010744", 0, "RE OVR"],
+            ["5010745", 0, "RH OVR"],
+            ["5010746", 0, "RN OVR"],
+            ["912605", 2, "ZME"]
           ]
         },
         {
@@ -1888,161 +1816,139 @@
           "freq": 118950000,
           "rn": "Adams Clearance",
           "ui": "etvs",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         },
         {
           "cs": "LIT_GND",
           "pos": "Ground",
           "freq": 121900000,
-          "rn": "Adams Ground",
+          "rn": "GC",
           "ui": "etvs",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         },
         {
           "cs": "LIT_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 118700000,
           "rn": "Adams Tower",
           "ui": "etvs",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         },
         {
           "cs": "LIT_E_APP",
-          "pos": "Radar East",
+          "pos": "RE",
           "freq": 135400000,
           "rn": "Little Rock Approach",
           "ui": "etvs",
           "lines": [
-            ["5010741", 0, "Radar "],
-            ["5010744", 0, "Arriva"],
-            ["5010747", 0, "Radar "],
-            ["5010748", 0, "Radar "],
-            ["912605", 2, "ZME"],
-            ["912705", 2, "LIT"]
+            ["5010741", 0, "RW OVR"],
+            ["5010744", 0, "AR OVR"],
+            ["5010747", 0, "RH OVR"],
+            ["5010748", 0, "RN OVR"],
+            ["912605", 2, "ZME"]
           ]
         },
         {
           "cs": "LIT_H_APP",
-          "pos": "Radar Hunt",
+          "pos": "RH",
           "freq": 119850000,
           "rn": "Little Rock Approach",
           "ui": "etvs",
           "lines": [
-            ["5010742", 0, "Radar "],
-            ["5010745", 0, "Arriva"],
-            ["5010747", 0, "Radar "],
-            ["5010749", 0, "Radar "],
-            ["912605", 2, "ZME"],
-            ["912705", 2, "LIT"]
+            ["5010742", 0, "RW OVR"],
+            ["5010745", 0, "AR OVR"],
+            ["5010747", 0, "RE OVR"],
+            ["5010749", 0, "RN OVR"],
+            ["912605", 2, "ZME"]
           ]
         },
         {
           "cs": "LIT_N_APP",
-          "pos": "Radar North",
+          "pos": "RN",
           "freq": 119750000,
           "rn": "Little Rock Approach",
           "ui": "etvs",
           "lines": [
-            ["5010743", 0, "Radar "],
-            ["5010746", 0, "Arriva"],
-            ["5010748", 0, "Radar "],
-            ["5010749", 0, "Radar "],
-            ["912605", 2, "ZME"],
-            ["912705", 2, "LIT"]
+            ["5010743", 0, "RW OVR"],
+            ["5010746", 0, "AR OVR"],
+            ["5010748", 0, "RE OVR"],
+            ["5010749", 0, "RH OVR"],
+            ["912605", 2, "ZME"]
           ]
         },
         {
           "cs": "LIT_W_APP",
-          "pos": "Radar West",
+          "pos": "RW",
           "freq": 119500000,
           "rn": "Little Rock Approach",
           "ui": "etvs",
           "lines": [
-            ["5010740", 0, "Arriva"],
-            ["5010741", 0, "Radar "],
-            ["5010742", 0, "Radar "],
-            ["5010743", 0, "Radar "],
-            ["912605", 2, "ZME"],
-            ["912705", 2, "LIT"]
+            ["5010740", 0, "AR OVR"],
+            ["5010741", 0, "RE OVR"],
+            ["5010742", 0, "RH OVR"],
+            ["5010743", 0, "RN OVR"],
+            ["912605", 2, "ZME"]
           ]
         }
       ],
       "childFacilities": [
         {
+          "id": "LRF",
+          "name": "Little Rock ATCT",
           "positions": [
             {
               "cs": "LRF_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 132800000,
               "rn": "Little Rock Ground",
               "ui": "etvs",
-              "lines": [["912706", 0, "LC"]],
-              "lines_obj": {
-                "912706": 1
-              }
+              "lines": [["912706", 0, "LC"]]
             },
             {
               "cs": "LRF_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 120600000,
               "rn": "Little Rock Tower",
               "ui": "etvs",
               "lines": [
-                ["912705", 2, "LIT-APP"],
+                ["912705", 2, "LIT"],
                 ["912706", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912705": 1,
-                "912706": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Little Rock ATCT",
-          "id": "LRF"
+          "childFacilities": []
         }
-      ],
-      "name": "Little Rock ATCT/TRACON",
-      "id": "LIT"
+      ]
     },
     {
+      "id": "FSM",
+      "name": "Fort Smith ATCT/TRACON",
       "positions": [
         {
           "cs": "FSM_DEL",
-          "pos": "Clearance",
+          "pos": "CD",
           "freq": 133850000,
           "rn": "Forth Smith Clearance",
           "ui": "ivsr",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         },
         {
           "cs": "FYV_E_APP",
-          "pos": "East Radar",
+          "pos": "ER",
           "freq": 126600000,
           "rn": "Razorback Approach",
-          "ui": "lstar",
+          "ui": "etvs",
           "lines": [
             ["912606", 2, "ZME"],
             ["912719", 2, "XNA"],
             ["912721", 2, "FSM"],
             ["912723", 2, "ROG"],
             ["912725", 2, "SDF"]
-          ],
-          "lines_obj": {
-            "912606": 1,
-            "912719": 1,
-            "912721": 1,
-            "912723": 1,
-            "912725": 1
-          }
+          ]
         },
         {
           "cs": "FSM_A_APP",
-          "pos": "FSM Arrival Radar",
+          "pos": "AR",
           "freq": 128150000,
           "rn": "Razorback Approach",
           "ui": "etvs",
@@ -2056,10 +1962,10 @@
         },
         {
           "cs": "FYV_B_APP",
-          "pos": "FYV Arrival Radar",
+          "pos": "AR",
           "freq": 134525000,
           "rn": "Razorback Approach",
-          "ui": "lstar",
+          "ui": "etvs",
           "lines": [
             ["912606", 2, "ZME"],
             ["912719", 2, "XNA"],
@@ -2070,33 +1976,23 @@
         },
         {
           "cs": "FSM_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121900000,
           "rn": "Fort Smith Ground",
           "ui": "etvs",
-          "lines": [["912722", 0, "LC"]],
-          "lines_obj": {
-            "912722": 1
-          }
+          "lines": [["912722", 0, "LC"]]
         },
         {
           "cs": "FSM_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 118300000,
           "rn": "Forth Smith Tower",
           "ui": "etvs",
-          "lines": [
-            ["912721", 2, "XNA-APP"],
-            ["912722", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912721": 1,
-            "912722": 1
-          }
+          "lines": [["912722", 0, "GC"]]
         },
         {
           "cs": "FSM_S_APP",
-          "pos": "South Radar",
+          "pos": "SR",
           "freq": 120900000,
           "rn": "Razorback Approach",
           "ui": "etvs",
@@ -2106,18 +2002,11 @@
             ["912721", 2, "FSM"],
             ["912723", 2, "ROG"],
             ["912725", 2, "SDF"]
-          ],
-          "lines_obj": {
-            "912606": 1,
-            "912719": 1,
-            "912721": 1,
-            "912723": 1,
-            "912725": 1
-          }
+          ]
         },
         {
           "cs": "FSM_SI_APP",
-          "pos": "Supervisor",
+          "pos": "SI",
           "freq": 121500000,
           "rn": "Supervisor",
           "ui": "etvs",
@@ -2125,160 +2014,133 @@
         },
         {
           "cs": "FYV_W_APP",
-          "pos": "West Radar",
+          "pos": "WR",
           "freq": 121000000,
           "rn": "Razorback Approach",
-          "ui": "lstar",
+          "ui": "etvs",
           "lines": [
             ["912606", 2, "ZME"],
             ["912719", 2, "XNA"],
             ["912721", 2, "FSM"],
             ["912723", 2, "ROG"],
             ["912725", 2, "SDF"]
-          ],
-          "lines_obj": {
-            "912606": 1,
-            "912719": 1,
-            "912721": 1,
-            "912723": 1,
-            "912725": 1
-          }
+          ]
         }
       ],
       "childFacilities": [
         {
+          "id": "FYV",
+          "name": "Drake ATCT",
           "positions": [
             {
               "cs": "FYV_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121800000,
               "rn": "Drake Ground",
               "ui": "lstar",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             },
             {
               "cs": "FYV_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 128000000,
               "rn": "Drake Tower",
               "ui": "lstar",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             }
           ],
-          "childFacilities": [],
-          "name": "Drake ATCT",
-          "id": "FYV"
+          "childFacilities": []
         },
         {
+          "id": "XNA",
+          "name": "Northwest Arkansas ATCT",
           "positions": [
             {
               "cs": "XNA_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121900000,
               "rn": "Northwest Arkansas Ground",
               "ui": "lstar",
-              "lines": [["912720", 0, "LC"]],
-              "lines_obj": {
-                "912720": 1
-              }
+              "lines": [["912720", 0, "LC"]]
             },
             {
               "cs": "XNA_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 127100000,
               "rn": "Northwest Arkansas Tower",
               "ui": "lstar",
               "lines": [
-                ["912719", 2, "XNA-APP"],
+                ["912719", 2, "RZC"],
                 ["912720", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912719": 1,
-                "912720": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Northwest Arkansas ATCT",
-          "id": "XNA"
+          "childFacilities": []
         },
         {
+          "id": "ASG",
+          "name": "Springdale ATCT",
           "positions": [
             {
               "cs": "ASG_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121600000,
               "rn": "Springdale Ground",
               "ui": "lstar",
-              "lines": [["912726", 0, "LC"]],
-              "lines_obj": {
-                "912726": 1
-              }
+              "lines": [
+                ["912726", 0, "LC"],
+                ["6150740", 2, "ZME"]
+              ]
             },
             {
               "cs": "ASG_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 118200000,
               "rn": "Springdale Tower",
               "ui": "lstar",
               "lines": [
-                ["912725", 2, "XNA-APP"],
+                ["912725", 2, "RZC"],
                 ["912726", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912725": 1,
-                "912726": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Springdale ATCT",
-          "id": "ASG"
+          "childFacilities": []
         },
         {
+          "id": "ROG",
+          "name": "Rogers ATCT",
           "positions": [
             {
               "cs": "ROG_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 118000000,
               "rn": "Rogers Ground",
               "ui": "lstar",
-              "lines": [["912724", 0, "LC"]],
-              "lines_obj": {
-                "912724": 1
-              }
+              "lines": [["912724", 0, "LC"]]
             },
             {
               "cs": "ROG_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 119375000,
               "rn": "Rogers Tower",
               "ui": "lstar",
               "lines": [
-                ["912723", 2, "XNA-APP"],
+                ["912723", 2, "RZC"],
                 ["912724", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912723": 1,
-                "912724": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Rogers ATCT",
-          "id": "ROG"
+          "childFacilities": []
         }
-      ],
-      "name": "Fort Smith ATCT/TRACON",
-      "id": "FSM"
+      ]
     },
     {
+      "id": "HSV",
+      "name": "Huntsville ATCT/TRACON",
       "positions": [
         {
           "cs": "HSV_DEL",
-          "pos": "Clearance",
+          "pos": "CD",
           "freq": 120350000,
           "rn": "Huntsville Clearance",
           "ui": "rdvs",
@@ -2286,140 +2148,104 @@
         },
         {
           "cs": "HSV_E_APP",
-          "pos": "East Radar",
+          "pos": "ER",
           "freq": 125600000,
           "rn": "Huntsville Approach",
           "ui": "rdvs",
-          "lines": [
-            ["912608", 2, "ZME"],
-            ["912707", 2, "HSV"]
-          ],
-          "lines_obj": {
-            "912608": 1,
-            "912707": 1
-          }
+          "lines": [["912608", 2, "ZME"]]
         },
         {
           "cs": "HSV_F_APP",
-          "pos": "Final Radar",
+          "pos": "FR",
           "freq": 118750000,
           "rn": "Huntsville Approach",
           "ui": "rdvs",
-          "lines": [
-            ["912608", 2, "ZME"],
-            ["912707", 2, "HSV"]
-          ]
+          "lines": [["912608", 2, "ZME"]]
         },
         {
           "cs": "HSV_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121900000,
           "rn": "Huntsville Ground",
           "ui": "rdvs",
-          "lines": [["912708", 0, "LC"]],
-          "lines_obj": {
-            "912708": 1
-          }
+          "lines": [["912708", 0, "LC"]]
         },
         {
           "cs": "HSV_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 127600000,
           "rn": "Huntsville Tower",
           "ui": "rdvs",
-          "lines": [
-            ["912707", 2, "HSV-APP"],
-            ["912708", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912707": 1,
-            "912708": 1
-          }
+          "lines": [["912708", 0, "GC"]]
         },
         {
           "cs": "HSV_W_APP",
-          "pos": "West Radar",
+          "pos": "WR",
           "freq": 118050000,
           "rn": "Huntsville Approach",
           "ui": "rdvs",
-          "lines": [
-            ["912608", 2, "ZME"],
-            ["912707", 2, "HSV"]
-          ],
-          "lines_obj": {
-            "912608": 1,
-            "912707": 1
-          }
+          "lines": [["912608", 2, "ZME"]]
         }
       ],
       "childFacilities": [
         {
+          "id": "HUA",
+          "name": "Redstone ATCT",
           "positions": [
             {
               "cs": "HUA_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 126950000,
               "rn": "Redstone Tower",
               "ui": "etvs",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             }
           ],
-          "childFacilities": [],
-          "name": "Redstone ATCT",
-          "id": "HUA"
+          "childFacilities": []
         }
-      ],
-      "name": "Huntsville ATCT/TRACON",
-      "id": "HSV"
+      ]
     },
     {
+      "id": "JAN",
+      "name": "Jackson ATCT/TRACON",
       "positions": [
         {
           "cs": "JAN_E_APP",
-          "pos": "East Radar",
+          "pos": "ER",
           "freq": 123900000,
           "rn": "Jackson Approach",
           "ui": "etvs",
-          "lines": [["912709", 2, "JAN"]]
+          "lines": []
         },
         {
           "cs": "JAN_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121700000,
           "rn": "Jackson Ground",
           "ui": "etvs",
-          "lines": [["912710", 0, "LC"]],
-          "lines_obj": {
-            "912710": 1
-          }
+          "lines": [["912710", 0, "LC"]]
         },
         {
           "cs": "JAN_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 120900000,
           "rn": "Jackson Tower",
           "ui": "etvs",
-          "lines": [
-            ["912709", 2, "JAN-APP"],
-            ["912710", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912709": 1,
-            "912710": 1
-          }
+          "lines": [["912710", 0, "GC"]]
         },
         {
           "cs": "JAN_W_APP",
-          "pos": "West Radar",
+          "pos": "WR",
           "freq": 125250000,
           "rn": "Jackson Approach",
           "ui": "etvs",
-          "lines": [["912709", 2, "JAN"]]
+          "lines": []
         }
       ],
       "childFacilities": [
         {
+          "id": "HKS",
+          "name": "Hawkins ATCT",
           "positions": [
             {
               "cs": "HKS_GND",
@@ -2427,211 +2253,166 @@
               "freq": 121900000,
               "rn": "Hawkins Ground",
               "ui": "lstar",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             },
             {
               "cs": "HKS_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 119650000,
               "rn": "Hawkins Tower",
               "ui": "lstar",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             }
           ],
-          "childFacilities": [],
-          "name": "Hawkins ATCT",
-          "id": "HKS"
+          "childFacilities": []
         }
-      ],
-      "name": "Jackson ATCT/TRACON",
-      "id": "JAN"
+      ]
     },
     {
+      "id": "HOP",
+      "name": "Fort Campbell ATCT/ARAC",
       "positions": [
         {
           "cs": "HOP_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121800000,
           "rn": "Campbell Ground",
           "ui": "etvs",
-          "lines": [["912738", 0, "LC"]],
-          "lines_obj": {
-            "912738": 1
-          }
+          "lines": [["912738", 0, "LC"]]
         },
         {
           "cs": "HOP_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 120900000,
           "rn": "Campbell Tower",
           "ui": "etvs",
-          "lines": [
-            ["912737", 2, "HOP-APP"],
-            ["912738", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912737": 1,
-            "912738": 1
-          }
+          "lines": [["912738", 0, "GC"]]
         },
         {
           "cs": "HOP_N_APP",
-          "pos": "North Radar",
+          "pos": "NR",
           "freq": 118100000,
           "rn": "Campbell Approach",
           "ui": "etvs",
-          "lines": [
-            ["912609", 2, "ZME"],
-            ["912737", 2, "HOP"]
-          ],
-          "lines_obj": {
-            "912609": 1,
-            "912737": 1
-          }
+          "lines": [["912609", 2, "ZME"]]
         },
         {
           "cs": "HOP_S_APP",
-          "pos": "South Radar",
+          "pos": "SR",
           "freq": 134350000,
           "rn": "Campbell Approach",
           "ui": "etvs",
-          "lines": [
-            ["912609", 2, "ZME"],
-            ["912737", 2, "HOP"]
-          ]
+          "lines": [["912609", 2, "ZME"]]
         }
       ],
       "childFacilities": [
         {
+          "id": "EOD",
+          "name": "Sabre AAF",
           "positions": [
             {
               "cs": "EOD_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 124675000,
               "rn": "Sabre Tower",
               "ui": "etvs",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             }
           ],
-          "childFacilities": [],
-          "name": "Sabre AAF",
-          "id": "EOD"
+          "childFacilities": []
         }
-      ],
-      "name": "Fort Campbell ATCT/ARAC",
-      "id": "HOP"
+      ]
     },
     {
+      "id": "CBM",
+      "name": "Columbus ATCT/RAPCON",
       "positions": [
         {
           "cs": "CBM_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121900000,
           "rn": "Columbus Ground",
           "ui": "etvs",
-          "lines": [["912728", 0, "LC"]],
-          "lines_obj": {
-            "912728": 1
-          }
+          "lines": [["912728", 0, "LC"]]
         },
         {
           "cs": "CBM_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 126650000,
           "rn": "Columbus Tower",
           "ui": "etvs",
-          "lines": [
-            ["912727", 2, "CBM-APP"],
-            ["912728", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912727": 1,
-            "912728": 1
-          }
+          "lines": [["912728", 0, "GC"]]
         },
         {
           "cs": "CBM_A_APP",
-          "pos": "North Radar",
+          "pos": "NR",
           "freq": 126075000,
           "rn": "Columbus Approach",
           "ui": "etvs",
           "lines": [
             ["912607", 2, "ZME"],
-            ["912727", 2, "CBM"],
             ["912729", 2, "GTR"]
           ]
         },
         {
           "cs": "CBM_E_APP",
-          "pos": "Southeast Radar",
+          "pos": "SER",
           "freq": 132025000,
           "rn": "Columbus Approach",
           "ui": "etvs",
           "lines": [
             ["912607", 2, "ZME"],
-            ["912727", 2, "CBM"],
             ["912729", 2, "GTR"]
           ]
         },
         {
           "cs": "CBM_W_APP",
-          "pos": "Southwest Radar",
+          "pos": "SWR",
           "freq": 135600000,
           "rn": "Columbus Approach",
           "ui": "etvs",
           "lines": [
             ["912607", 2, "ZME"],
-            ["912727", 2, "CBM"],
             ["912729", 2, "GTR"]
           ]
         }
       ],
       "childFacilities": [
         {
+          "id": "GTR",
+          "name": "Golden Triangle ATCT",
           "positions": [
             {
               "cs": "GTR_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 135375000,
               "rn": "Golden Triangle Ground",
               "ui": "etvs",
-              "lines": [["912730", 0, "LC"]],
-              "lines_obj": {
-                "912730": 1
-              }
+              "lines": [["912730", 0, "LC"]]
             },
             {
               "cs": "GTR_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 118200000,
               "rn": "Golden Triangle Tower",
               "ui": "etvs",
               "lines": [
-                ["912729", 2, "CBM-APP"],
+                ["912729", 2, "CBM"],
                 ["912730", 0, "GC"]
-              ],
-              "lines_obj": {
-                "912729": 1,
-                "912730": 1
-              }
+              ]
             }
           ],
-          "childFacilities": [],
-          "name": "Golden Triangle ATCT",
-          "id": "GTR"
+          "childFacilities": []
         }
-      ],
-      "name": "Columbus ATCT/RAPCON",
-      "id": "CBM"
+      ]
     },
     {
+      "id": "NMM",
+      "name": "Meridian ATCT/RATCF",
       "positions": [
         {
           "cs": "NMM_APP",
-          "pos": "Approach",
+          "pos": "APP",
           "freq": 120500000,
           "rn": "Meridian Approach",
           "ui": "etvs",
@@ -2639,230 +2420,191 @@
         },
         {
           "cs": "NMM_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 126200000,
           "rn": "Navy Mc Cain Tower",
           "ui": "etvs",
-          "lines": [],
-          "lines_obj": {}
+          "lines": []
         }
       ],
       "childFacilities": [
         {
+          "id": "MEI",
+          "name": "Key Field ATCT",
           "positions": [
             {
               "cs": "MEI_GND",
-              "pos": "Ground",
+              "pos": "GC",
               "freq": 121900000,
               "rn": "Key Ground",
               "ui": "etvs",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             },
             {
               "cs": "MEI_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 133975000,
               "rn": "Key Tower",
               "ui": "etvs",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             }
           ],
-          "childFacilities": [],
-          "name": "Key Field ATCT",
-          "id": "MEI"
+          "childFacilities": []
         },
         {
+          "id": "NJW",
+          "name": "Joe Williams ATCT",
           "positions": [
             {
               "cs": "NJW_TWR",
-              "pos": "Local",
+              "pos": "LC",
               "freq": 118475000,
               "rn": "Bravo Tower",
               "ui": "etvs",
-              "lines": [],
-              "lines_obj": {}
+              "lines": []
             }
           ],
-          "childFacilities": [],
-          "name": "Joe Williams ATCT",
-          "id": "NJW"
+          "childFacilities": []
         }
-      ],
-      "name": "Meridian ATCT/RATCF",
-      "id": "NMM"
+      ]
     },
     {
+      "id": "CGI",
+      "name": "Cape Girardeau ATCT",
       "positions": [
         {
           "cs": "CGI_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121600000,
           "rn": "Cape Girardeau Ground",
-          "ui": "etvs",
-          "lines": [["912742", 0, "LC"]],
-          "lines_obj": {
-            "912742": 1
-          }
+          "ui": "lstar",
+          "lines": [["912742", 0, "LC"]]
         },
         {
           "cs": "CGI_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 125525000,
           "rn": "Cape Girardeau Tower",
-          "ui": "etvs",
+          "ui": "lstar",
           "lines": [
             ["912741", 2, "ZME"],
             ["912742", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912741": 1,
-            "912742": 1
-          }
+          ]
         }
       ],
-      "childFacilities": [],
-      "name": "Cape Girardeau ATCT",
-      "id": "CGI"
+      "childFacilities": []
     },
     {
+      "id": "GLH",
+      "name": "Greenville ATCT",
       "positions": [
         {
           "cs": "GLH_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121800000,
           "rn": "Greenville Ground",
           "ui": "stvs",
-          "lines": [["912734", 0, "LC"]],
-          "lines_obj": {
-            "912734": 1
-          }
+          "lines": [["912734", 0, "LC"]]
         },
         {
           "cs": "GLH_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 119000000,
           "rn": "Greenville Tower",
           "ui": "stvs",
           "lines": [
             ["912733", 2, "ZME"],
             ["912734", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912733": 1,
-            "912734": 1
-          }
+          ]
         }
       ],
-      "childFacilities": [],
-      "name": "Greenville ATCT",
-      "id": "GLH"
+      "childFacilities": []
     },
     {
+      "id": "GWO",
+      "name": "Greenwood ATCT",
       "positions": [
         {
           "cs": "GWO_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 125550000,
           "rn": "Greenwood Ground",
-          "ui": "etvs",
-          "lines": [["912736", 0, "LC"]],
-          "lines_obj": {
-            "912736": 1
-          }
+          "ui": "stvs",
+          "lines": [["912736", 0, "LC"]]
         },
         {
           "cs": "GWO_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 118350000,
           "rn": "Greenwood Tower",
-          "ui": "etvs",
+          "ui": "stvs",
           "lines": [
             ["912735", 2, "ZME"],
             ["912736", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912735": 1,
-            "912736": 1
-          }
+          ]
         }
       ],
-      "childFacilities": [],
-      "name": "Greenwood ATCT",
-      "id": "GWO"
+      "childFacilities": []
     },
     {
+      "id": "TUP",
+      "name": "Tupelo ATCT",
       "positions": [
         {
           "cs": "TUP_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121825000,
           "rn": "Tupelo Ground",
-          "ui": "etvs",
-          "lines": [["912732", 0, "LC"]],
-          "lines_obj": {
-            "912732": 1
-          }
+          "ui": "stvs",
+          "lines": [["912732", 0, "LC"]]
         },
         {
           "cs": "TUP_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 118775000,
           "rn": "Tupelo Tower",
-          "ui": "etvs",
+          "ui": "stvs",
           "lines": [
             ["912731", 2, "ZME"],
             ["912732", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912731": 1,
-            "912732": 1
-          }
+          ]
         }
       ],
-      "childFacilities": [],
-      "name": "Tupelo ATCT",
-      "id": "TUP"
+      "childFacilities": []
     },
     {
+      "id": "PAH",
+      "name": "Paducah ATCT",
       "positions": [
         {
           "cs": "PAH_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 121700000,
           "rn": "Paducah Ground",
-          "ui": "vscs",
-          "lines": [["912740", 0, "LC"]],
-          "lines_obj": {
-            "912740": 1
-          }
+          "ui": "stvs",
+          "lines": [["912740", 0, "LC"]]
         },
         {
           "cs": "PAH_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 119600000,
           "rn": "Paducah Tower",
-          "ui": "vscs",
+          "ui": "stvs",
           "lines": [
             ["912739", 2, "ZME"],
             ["912740", 0, "GC"]
-          ],
-          "lines_obj": {
-            "912739": 1,
-            "912740": 1
-          }
+          ]
         }
       ],
-      "childFacilities": [],
-      "name": "Paducah ATCT",
-      "id": "PAH"
+      "childFacilities": []
     },
     {
+      "id": "MKL",
+      "name": "Jackson ATCT",
       "positions": [
         {
           "cs": "MKL_GND",
-          "pos": "Ground",
+          "pos": "GC",
           "freq": 120900000,
           "rn": "Jackson Ground",
           "ui": "lstar",
@@ -2870,21 +2612,14 @@
         },
         {
           "cs": "MKL_TWR",
-          "pos": "Local",
+          "pos": "LC",
           "freq": 127150000,
           "rn": "Jackson Tower",
           "ui": "lstar",
-          "lines": [
-            ["912709", 2, "JAN-APP"],
-            ["912710", 0, "GC"]
-          ]
+          "lines": [["912710", 0, "GC"]]
         }
       ],
-      "childFacilities": [],
-      "name": "Jackson ATCT",
-      "id": "MKL"
+      "childFacilities": []
     }
-  ],
-  "name": "Memphis ARTCC",
-  "id": "ZME"
+  ]
 }

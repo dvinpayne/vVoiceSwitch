@@ -86,7 +86,7 @@ export function findRdvsColorPattern(positionData: Facility, positionCallsign: s
     return result.rdvsColorPattern || null;
 }
 
-// Helper function to resolve a dial code to a target callsign
+// Helper function to resolve a dial code to a destination CRC line ID
 // trunkName: The trunk name from the type 3 line label (e.g., "APCH", "S-BAY")
 // dialCode: The 2-digit code entered by the user (e.g., "11", "42")
 export function resolveDialCode(dialCodeTable: DialCodeTable | null, trunkName: string, dialCode: string): string | null {
@@ -564,24 +564,24 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 return;
             }
             
-            // Resolve the dial code to a target callsign
-            const target = resolveDialCode(dialCodeTable, trunkName, dialCode);
-            if (!target) {
+            // Resolve the dial code to the destination line ID
+            const targetLineId = resolveDialCode(dialCodeTable, trunkName, dialCode);
+            if (!targetLineId) {
                 console.error('[dial_call] Could not resolve dial code:', { trunkName, dialCode });
                 set({ dialCallStatus: 'error' });
                 return;
             }
             
-            console.log('[dial_call] Resolved:', { trunkName, dialCode, target });
+            console.log('[dial_call] Resolved:', { trunkName, dialCode, targetLineId });
             
             // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing' });
             
-            // Send the call command - use type 'call' with the resolved target
+            // Send the call command with the destination line ID
             // dbl1 = 1 for ring-type call (plays chime at destination)
             sendMessageNow({ 
                 type: 'call', 
-                cmd1: target,           // The resolved target callsign
+                cmd1: targetLineId,     // The destination CRC line ID
                 dbl1: 1                 // Call type 1 = ring call
             });
             
