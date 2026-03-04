@@ -146,18 +146,23 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     }
     ds.sendMessageNow = sendMessageNow;
 
+    let syncTimeout: ReturnType<typeof setTimeout> | null = null;
     function resetWindow() {
-        sendMessageNow({ type: 'del', cmd1: '', dbl1: 0 })
         const { callsign = '', cid = 0 } = get();
-        if (!callsign) {
+        const { selectedPositions: selected_positions } = get();
+        // Don't send del/sync until we have both callsign AND positions
+        // to avoid wiping server state before we can re-register lines
+        if (!callsign || !selected_positions || selected_positions.length === 0) {
             return;
         }
+        // Cancel any pending sync from a previous resetWindow call
+        if (syncTimeout) clearTimeout(syncTimeout);
+        sendMessageNow({ type: 'del', cmd1: '', dbl1: 0 })
         // Collect all lines from selected positions, preserving order
         // Track placeholder indices for empty [] entries
         const orderedLines: any[] = [];
         const placeholderPositions: number[] = [];
         const seenIds = new Set<string>();
-        const { selectedPositions: selected_positions } = get();
         let positionIndex = 0;
         
         // First pass: collect lines in order from position config
@@ -208,8 +213,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             addCall(line[1], '' + line[0])
         }
         cid && addIaCall(1, '' + cid)
-        setTimeout(() => {
+        syncTimeout = setTimeout(() => {
             sendMessageNow({ type: 'sync' })
+            syncTimeout = null;
         }, 4000)
     }
     setInterval(() => {

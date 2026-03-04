@@ -189,6 +189,12 @@ export default function Page() {
     }
   }, [connected, isLocalhost, selectedPositions, currentUI]);
 
+  // Update page title to reflect the loaded UI
+  useEffect(() => {
+    const uiLabel = currentUI ? currentUI.toUpperCase() : 'vIVSR';
+    document.title = `v${uiLabel}`;
+  }, [currentUI]);
+
   // VSCS Zustand state mapping
   const activeLandlines = useCoreStore(s => s.activeLandlines || []);
   const incomingLandlines = useCoreStore(s => s.incomingLandlines || []);
