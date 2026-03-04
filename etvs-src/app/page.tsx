@@ -12,39 +12,112 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCoreStore } from '../model';
 
+// VATSIM controllers feed URL (proxied through API to avoid CORS)
+const VATSIM_CONTROLLERS_URL = '/api/vatsim/controllers';
+
 export default function HomePage() {
   const [isGG3Active, setIsGG3Active] = useState(false);
   const [currentGGPage, setCurrentGGPage] = useState(1);
   const [settingModal, setSettingModal] = useState(false);
   const setPosData = require('../model').useCoreStore((s: any) => s.setPositionData);
+  const updateSelectedPositions = useCoreStore((s: any) => s.updateSelectedPositions);
   const callsign = useCoreStore((s: any) => s.callsign);
+  const cid = useCoreStore((s: any) => s.cid);
   const [filteredPosition, setFilteredPosition] = useState<any>(null);
 
   useEffect(() => {
-    function find(stp: any, found: boolean): any {
-      if (!stp) return null;
+    // Collect all positions matching this callsign from the facility tree
+    function findAllPositions(stp: any): any[] {
+      const results: any[] = [];
+      if (!stp) return results;
       if (Array.isArray(stp.positions)) {
         for (const e of stp.positions) {
           if (e.cs === callsign) {
-            return stp;
+            results.push({ facility: stp, position: e });
           }
         }
       }
       if (Array.isArray(stp.childFacilities)) {
         for (const k of stp.childFacilities) {
-          const f = find(k, found);
+          results.push(...findAllPositions(k));
+        }
+      }
+      return results;
+    }
+
+    // Find the facility that contains the matching position
+    function findFacility(stp: any): any {
+      if (!stp) return null;
+      if (Array.isArray(stp.positions)) {
+        for (const e of stp.positions) {
+          if (e.cs === callsign) return stp;
+        }
+      }
+      if (Array.isArray(stp.childFacilities)) {
+        for (const k of stp.childFacilities) {
+          const f = findFacility(k);
           if (f) return f;
         }
       }
       return null;
     }
-    axios.get('/zoa_position.json').then(r => {
-      const prod = find(r.data, false);
-      setPosData(prod);
+
+    if (!callsign) return;
+
+    axios.get('/zoa_position.json').then(async (r) => {
+      const facility = findFacility(r.data);
+      setPosData(facility);
+
+      // Find all positions matching this callsign
+      const matches = findAllPositions(r.data);
+      
+      if (matches.length === 0) return;
+      
+      if (matches.length === 1) {
+        // Only one match — use it directly
+        updateSelectedPositions([matches[0].position]);
+        return;
+      }
+      
+      // Multiple positions share this callsign — disambiguate via VATSIM feed
+      try {
+        const feedRes = await axios.get(VATSIM_CONTROLLERS_URL);
+        const feed = feedRes.data;
+        if (feed?.controllers) {
+          const cidStr = String(cid);
+          const controller = feed.controllers.find((c: any) => c.vatsimData?.cid === cidStr);
+          if (controller) {
+            const primaryPos = controller.positions?.find((p: any) => p.isPrimary);
+            const positionName = primaryPos?.positionName;
+            if (positionName) {
+              // Match VATSIM positionName against the "pos" field in config
+              const disambiguated = matches.find((m: any) => m.position.pos === positionName);
+              if (disambiguated) {
+                updateSelectedPositions([disambiguated.position]);
+                return;
+              }
+            }
+            // Try frequency-based disambiguation
+            const freq = controller.vatsimData?.primaryFrequency;
+            if (freq) {
+              const byFreq = matches.find((m: any) => m.position.freq === freq);
+              if (byFreq) {
+                updateSelectedPositions([byFreq.position]);
+                return;
+              }
+            }
+          }
+        }
+      } catch {
+        // VATSIM feed unavailable, fall through to first match
+      }
+      
+      // Fallback: use first match
+      updateSelectedPositions([matches[0].position]);
     }).catch(() => {
       // Optionally handle error
     });
-  }, [setPosData, callsign]);
+  }, [setPosData, updateSelectedPositions, callsign, cid]);
 
   const handleGG3Toggle = (isActive: boolean, page: number) => {
     setIsGG3Active(isActive);

@@ -195,9 +195,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
         }
         
-        call_table = {
-            "891": ["TEST", 2],
-        }
+        call_table = {}
         // Reset and populate line_order for sorting gg_status later
         line_order = {};
         ag_freq_order = [];
@@ -209,9 +207,6 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             line_order[String(line[0])] = item.originalIndex;
             addCall(line[1], '' + line[0])
         }
-        // TEST line comes after all configured lines
-        line_order["891"] = positionIndex++;
-        addCall(2, '891')
         cid && addIaCall(1, '' + cid)
         setTimeout(() => {
             sendMessageNow({ type: 'sync' })
@@ -288,7 +283,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             new_vscs.push({ ...k })
                         } else {
                             const call_id = resolveCallId(k.call || '');
-                            k.call_name = call_table[call_id]?.[0]
+                            k.call_name = call_table[call_id]?.[0] || call_id
                             k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
                             new_gg.push({ ...k })
                             if (k.call?.startsWith('SO_')) {

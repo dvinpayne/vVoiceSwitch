@@ -126,12 +126,49 @@ export function matchControllerToPosition(
   // Search for matching position in the position data
   const positions = getAllPositions(positionData);
   
-  // Try exact match first
-  let match = positions.find(p => p.cs === controllerCallsign);
+  // Try exact callsign match — but handle ambiguity when multiple positions share it
+  const csMatches = positions.filter(p => p.cs === controllerCallsign);
+  let match: any = null;
   
-  // If no exact match, try matching by default callsign
+  if (csMatches.length === 1) {
+    match = csMatches[0];
+  } else if (csMatches.length > 1) {
+    // Multiple positions share this callsign (e.g. BOS_TWR has LCE, LCW, LCH)
+    // Use VATSIM positionName to disambiguate against the "pos" field in config
+    const primaryPosition = controller?.positions?.find(p => p.isPrimary);
+    const positionName = primaryPosition?.positionName;
+    if (positionName) {
+      match = csMatches.find(p => p.pos === positionName);
+    }
+    // If positionName didn't match, try frequency-based disambiguation
+    if (!match && controller?.vatsimData?.primaryFrequency) {
+      const freq = controller.vatsimData.primaryFrequency;
+      match = csMatches.find(p => p.freq === freq);
+    }
+    // Last resort: take the first match
+    if (!match) {
+      match = csMatches[0];
+    }
+  }
+  
+  // If no exact match, try matching by default callsign (with same disambiguation)
   if (!match && defaultCallsign) {
-    match = positions.find(p => p.cs === defaultCallsign);
+    const defaultMatches = positions.filter(p => p.cs === defaultCallsign);
+    if (defaultMatches.length === 1) {
+      match = defaultMatches[0];
+    } else if (defaultMatches.length > 1) {
+      const primaryPosition = controller?.positions?.find(p => p.isPrimary);
+      const positionName = primaryPosition?.positionName;
+      if (positionName) {
+        match = defaultMatches.find(p => p.pos === positionName);
+      }
+      if (!match && controller?.vatsimData?.primaryFrequency) {
+        match = defaultMatches.find(p => p.freq === controller!.vatsimData.primaryFrequency);
+      }
+      if (!match) {
+        match = defaultMatches[0];
+      }
+    }
   }
   
   // If still no match, try partial matching (e.g., "OAK_TWR" matches "OAK_1_TWR")
@@ -254,42 +291,31 @@ export async function autoDetectPosition(
   // If we don't have a valid callsign, can't auto-detect
   if (!callsign) return null;
   
-  // FIRST: Try to match directly using AFV callsign (most reliable, real-time)
-  const directMatch = matchControllerToPosition(null, positionData, callsign);
-  
-  if (directMatch) {
-    // Optionally fetch VATSIM data for additional info (but don't use it for matching)
-    let controller: VatsimController | null = null;
-    if (cid && cid !== 0) {
-      const feed = await fetchVatsimControllers();
-      if (feed) {
-        controller = findControllerByCid(feed, cid);
+  // Fetch VATSIM controller data early so we can disambiguate shared callsigns
+  let controller: VatsimController | null = null;
+  if (cid && cid !== 0) {
+    const feed = await fetchVatsimControllers();
+    if (feed) {
+      controller = findControllerByCid(feed, cid);
+      if (!controller && callsign) {
+        controller = findControllerByCallsign(feed, callsign);
       }
     }
-    
+  }
+  
+  // Try to match using AFV callsign + VATSIM data for disambiguation
+  const directMatch = matchControllerToPosition(controller, positionData, callsign);
+  
+  if (directMatch) {
     return {
       controller,
       position: directMatch.position,
       ui: directMatch.ui,
-      method: 'afv-direct',
+      method: controller ? 'vatsim-match' : 'afv-direct',
     };
   }
   
-  // FALLBACK: If no direct match, try VATSIM data
-  if (!cid || cid === 0) return null;
-  
-  // Fetch VATSIM controller data
-  const feed = await fetchVatsimControllers();
-  if (!feed) return null;
-  
-  // Find the controller by CID first (most reliable)
-  let controller = findControllerByCid(feed, cid);
-  
-  // If not found by CID, try by callsign
-  if (!controller && callsign) {
-    controller = findControllerByCallsign(feed, callsign);
-  }
-  
+  // If no match and no controller data, can't do anything more
   if (!controller) return null;
   
   // Check if the controller is an observer
@@ -299,18 +325,6 @@ export async function autoDetectPosition(
       position: null,
       ui: 'vscs',
       method: 'vatsim-infer',
-    };
-  }
-  
-  // Try to match using VATSIM data but still prefer AFV callsign
-  const match = matchControllerToPosition(controller, positionData, callsign);
-  
-  if (match) {
-    return {
-      controller,
-      position: match.position,
-      ui: match.ui,
-      method: 'vatsim-match',
     };
   }
   
