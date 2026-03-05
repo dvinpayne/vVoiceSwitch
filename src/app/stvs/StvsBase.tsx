@@ -65,7 +65,7 @@ import StvsKeypad from "./StvsKeypad";
 import StvsLever from "./StvsSwitch";
 import { useCoreStore } from "~/model";
 import { shallow } from "zustand/shallow";
-import SettingModal from "../components/SettingModal";
+import SettingModal from "~/pages/setting";
 // ...existing code...
 
 

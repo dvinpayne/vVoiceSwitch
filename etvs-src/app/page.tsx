@@ -7,7 +7,7 @@ import GroundGroundPage from "./_components/ground_ground/GroundGroundPage";
 import AreaThree from "./_components/special_func/AreaThree";
 import StatusArea from "./_components/status/StatusArea";
 import AreaFour from "./_components/special_func/AreaFour";
-import SettingModal from './_components/special_func/SettingModal';
+import SettingModal from '../../src/pages/setting';
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCoreStore } from '../model';

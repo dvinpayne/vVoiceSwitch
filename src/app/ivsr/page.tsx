@@ -1,7 +1,7 @@
 "use client";
 // Example usage: you can use filteredPosition in your UI below
 import React, { useState } from "react";
-import SettingModal from "../_components/vatlines/SettingModal";
+import SettingModal from "~/pages/setting";
 import AreaFour from "../_components/special_func/AreaFour";
 import AreaThree from "../_components/special_func/AreaThree";
 import AirGroundPage from "../_components/air_ground/AirGroundPage";
@@ -49,7 +49,7 @@ export default function IVSRPage() {
 			: { pos: "FD/CD" };
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
-			<SettingModal open={settingModal} setModal={setSettingModal} position={filteredPosition} />
+			<SettingModal open={settingModal} setModal={setSettingModal} />
 			<div className="flex h-screen items-center justify-center">
 				<div className="mt-2 box-border rounded-lg border-60 border-gray-500 shadow-2xl">
 					<div style={{ filter: `brightness(${brightness / 100})` }}>

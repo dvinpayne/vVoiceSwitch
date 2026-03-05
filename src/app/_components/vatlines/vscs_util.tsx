@@ -2,7 +2,7 @@ import { useState } from 'react';
 import VscsButtonComponent from './vscs_button';
 import VscsStaticButton from './vscs_static_button';
 import { ButtonType } from './App';
-import SettingModal from '~/app/components/SettingModal';
+import SettingModal from '~/pages/setting';
 import { useCoreStore } from '../../../model';
 
 interface VscsUtilProps {
