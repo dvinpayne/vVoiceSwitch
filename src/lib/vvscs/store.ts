@@ -91,8 +91,10 @@ class VvscsStore {
    * Called by model.ts resetWindow() when position config is loaded.
    */
   setConfiguredLines(lines: VvscsConfiguredLine[]): void {
+    console.log('[vVSCS Store] setConfiguredLines called with', lines.length, 'lines:', lines);
     this.configuredLines = lines;
     this.refreshGgStatus();
+    console.log('[vVSCS Store] After refreshGgStatus, gg_status has', this.storeGet?.()?.gg_status?.length, 'entries');
   }
 
   getConfiguredLines(): VvscsConfiguredLine[] {
@@ -363,7 +365,10 @@ class VvscsStore {
    * Trigger a refresh of gg_status to include v-VSCS entries.
    */
   private refreshGgStatus(): void {
-    if (!this.storeGet || !this.storeSet) return;
+    if (!this.storeGet || !this.storeSet) {
+      console.warn('[vVSCS Store] refreshGgStatus: storeGet/storeSet not bound yet!');
+      return;
+    }
 
     const state = this.storeGet();
     const currentGg = state.gg_status || [];
@@ -373,6 +378,7 @@ class VvscsStore {
 
     // Get current v-VSCS entries
     const vvscsGg = this.getGgStatusEntries();
+    console.log('[vVSCS Store] refreshGgStatus: nonVvscs=', nonVvscsGg.length, 'vvscsEntries=', vvscsGg.length, vvscsGg);
 
     // Merge
     const merged = [...nonVvscsGg, ...vvscsGg];

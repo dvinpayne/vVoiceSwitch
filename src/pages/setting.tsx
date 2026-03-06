@@ -4,7 +4,7 @@ import Input from 'antd/es/input'
 import Button from 'antd/es/button'
 import Switch from 'antd/es/switch'
 import { useCoreStore, type Facility } from '../model';
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { loadVacsCredentials, clearVacsCredentials } from '../lib/vacs/store';
 import { VVSCS_SERVER_URL } from '../lib/vvscs/types';
 
@@ -60,10 +60,10 @@ function SettingModal({ open, setModal }: SettingModalProps) {
         return saved?.useProd ?? false;
     })
     const [hasSavedToken, setHasSavedToken] = useState(() => !!loadVacsCredentials())
-    const [vacsOauthSessionId, setVacsOauthSessionId] = useState<string | null>(null)
-    const [vacsCallbackUrl, setVacsCallbackUrl] = useState('')
     const [vacsOauthLoading, setVacsOauthLoading] = useState(false)
-    const [vacsOauthError, setVacsOauthError] = useState<string | null>(null)
+    const [vacsOauthStatus, setVacsOauthStatus] = useState<string | null>(null)
+    const popupRef = useRef<Window | null>(null)
+    const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const [vvscsFacility, setVvscsFacility] = useState('')
     const [vvscsPosition, setVvscsPosition] = useState('')
 
@@ -123,86 +123,122 @@ function SettingModal({ open, setModal }: SettingModalProps) {
         setHasSavedToken(false);
     }, []);
 
-    /** Step 1: Start VACS OAuth — call our server, open VATSIM auth popup */
+    /** Stop polling the popup */
+    const stopPolling = useCallback(() => {
+        if (pollRef.current) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+        }
+    }, []);
+
+    /** Complete the VACS OAuth exchange: code+state → WS token → connect */
+    const completeVacsExchange = useCallback(async (sessionId: string, code: string, state: string) => {
+        setVacsOauthStatus('Exchanging token...');
+        try {
+            const res = await fetch('/api/vacs/auth/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, code, state }),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.token) {
+                setVacsOauthStatus('Error: ' + (data.error || 'Failed to get token'));
+                setVacsOauthLoading(false);
+                return;
+            }
+            setVacsOauthStatus('Connected!');
+            const positionId = callsign || undefined;
+            connectVacs(data.token, positionId, useProdVacs);
+            setTimeout(() => {
+                setHasSavedToken(!!loadVacsCredentials());
+                setVacsOauthStatus(null);
+            }, 2000);
+        } catch (err: any) {
+            setVacsOauthStatus('Error: ' + (err.message || 'Network error'));
+        } finally {
+            setVacsOauthLoading(false);
+        }
+    }, [callsign, connectVacs, useProdVacs]);
+
+    /**
+     * Login with VATSIM: open popup, poll for the vacs:// redirect.
+     *
+     * After the user authorizes on VATSIM, the browser redirects to:
+     *   vacs://auth/vatsim/callback?code=X&state=Y
+     * The browser can't load vacs:// — the popup shows an error page or protocol dialog.
+     * We poll popup.location to catch this URL and extract code+state automatically.
+     */
     const handleVacsLogin = useCallback(async () => {
-        setVacsOauthError(null);
+        stopPolling();
         setVacsOauthLoading(true);
+        setVacsOauthStatus('Starting login...');
         try {
             const env = useProdVacs ? 'prod' : 'dev';
             const res = await fetch(`/api/vacs/auth/login?env=${env}`);
             const data = await res.json();
             if (!res.ok || !data.url) {
-                setVacsOauthError(data.error || 'Failed to start login');
+                setVacsOauthStatus('Error: ' + (data.error || 'Failed to start login'));
+                setVacsOauthLoading(false);
                 return;
             }
-            setVacsOauthSessionId(data.sessionId);
-            // Open VATSIM auth in a popup
-            window.open(data.url, 'vacs_auth', 'width=600,height=700,popup=yes');
+            const sessionId = data.sessionId;
+            setVacsOauthStatus('Waiting for VATSIM authorization...');
+
+            // Open popup
+            const popup = window.open(data.url, 'vacs_auth', 'width=600,height=700,popup=yes');
+            popupRef.current = popup;
+
+            if (!popup) {
+                setVacsOauthStatus('Popup blocked — please allow popups and try again');
+                setVacsOauthLoading(false);
+                return;
+            }
+
+            // Poll the popup location every 200ms to catch the vacs:// redirect
+            let resolved = false;
+            pollRef.current = setInterval(() => {
+                try {
+                    if (!popup || popup.closed) {
+                        stopPolling();
+                        if (!resolved) {
+                            setVacsOauthStatus(null);
+                            setVacsOauthLoading(false);
+                        }
+                        return;
+                    }
+                    // Try to read the popup URL — will throw SecurityError while on auth.vatsim.net
+                    const href = popup.location.href;
+                    if (href && href.startsWith('vacs://')) {
+                        // Caught the callback URL!
+                        resolved = true;
+                        stopPolling();
+                        popup.close();
+                        // Extract code and state
+                        const parseable = href.replace(/^vacs:\/\//, 'https://vacs.internal/');
+                        const parsed = new URL(parseable);
+                        const code = parsed.searchParams.get('code') || '';
+                        const state = parsed.searchParams.get('state') || '';
+                        if (code && state) {
+                            completeVacsExchange(sessionId, code, state);
+                        } else {
+                            setVacsOauthStatus('Error: callback URL missing code/state');
+                            setVacsOauthLoading(false);
+                        }
+                    }
+                } catch {
+                    // SecurityError is expected while popup is on cross-origin auth.vatsim.net — just keep polling
+                }
+            }, 200);
         } catch (err: any) {
-            setVacsOauthError(err.message || 'Network error');
-        } finally {
+            setVacsOauthStatus('Error: ' + (err.message || 'Network error'));
             setVacsOauthLoading(false);
         }
-    }, [useProdVacs]);
+    }, [useProdVacs, stopPolling, completeVacsExchange]);
 
-    /** Step 2: User pastes the vacs://callback URL — extract code+state, complete exchange */
-    const handleVacsCallback = useCallback(async () => {
-        if (!vacsCallbackUrl.trim() || !vacsOauthSessionId) return;
-        setVacsOauthError(null);
-        setVacsOauthLoading(true);
-        try {
-            // Parse code and state from the pasted URL
-            // URL looks like: vacs://auth/vatsim/callback?code=ABC&state=XYZ
-            const url = vacsCallbackUrl.trim();
-            let code = '';
-            let state = '';
-
-            // Handle both vacs:// (custom protocol) and https:// URLs
-            try {
-                // Replace vacs:// with https:// so URL parser works
-                const parseable = url.replace(/^vacs:\/\//, 'https://vacs.internal/');
-                const parsed = new URL(parseable);
-                code = parsed.searchParams.get('code') || '';
-                state = parsed.searchParams.get('state') || '';
-            } catch {
-                // Try regex fallback for malformed URLs
-                const codeMatch = url.match(/[?&]code=([^&]+)/);
-                const stateMatch = url.match(/[?&]state=([^&]+)/);
-                code = codeMatch?.[1] || '';
-                state = stateMatch?.[1] || '';
-            }
-
-            if (!code || !state) {
-                setVacsOauthError('Could not find code and state in the pasted URL. Make sure you copied the full URL from the popup address bar.');
-                return;
-            }
-
-            // Call our complete endpoint to exchange code → WS token
-            const res = await fetch('/api/vacs/auth/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: vacsOauthSessionId, code, state }),
-            });
-
-            const data = await res.json();
-            if (!res.ok || !data.token) {
-                setVacsOauthError(data.error || 'Failed to get token');
-                return;
-            }
-
-            // Success! Connect using the obtained token
-            const positionId = callsign || undefined;
-            connectVacs(data.token, positionId, useProdVacs);
-            setVacsCallbackUrl('');
-            setVacsOauthSessionId(null);
-            setVacsOauthError(null);
-            setTimeout(() => setHasSavedToken(!!loadVacsCredentials()), 3000);
-        } catch (err: any) {
-            setVacsOauthError(err.message || 'Network error');
-        } finally {
-            setVacsOauthLoading(false);
-        }
-    }, [vacsCallbackUrl, vacsOauthSessionId, callsign, connectVacs, useProdVacs]);
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => { stopPolling(); };
+    }, [stopPolling]);
 
     const handleVvscsConnect = useCallback(() => {
         if (!vvscsFacility.trim() || !vvscsPosition.trim()) return;
@@ -321,20 +357,24 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                                 </Button>
                             </div>
                         )}
-                        {vacsOauthError && (
-                            <div style={{ fontSize: 12, color: '#ff4d4f', marginBottom: 8 }}>
-                                {vacsOauthError}
+                        {vacsOauthStatus && (
+                            <div style={{
+                                fontSize: 12,
+                                marginBottom: 8,
+                                color: vacsOauthStatus.startsWith('Error') ? '#ff4d4f' : '#1677ff',
+                            }}>
+                                {vacsOauthStatus}
                             </div>
                         )}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                             <Button
                                 size="small"
                                 type="primary"
-                                loading={vacsOauthLoading && !vacsOauthSessionId}
+                                loading={vacsOauthLoading}
                                 onClick={handleVacsLogin}
-                                disabled={!!vacsOauthSessionId}
+                                disabled={vacsOauthLoading}
                             >
-                                {vacsOauthSessionId ? '1. Done — now paste URL below' : 'Login with VATSIM'}
+                                Login with VATSIM
                             </Button>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
                                 <span style={{ fontSize: 12, color: '#999' }}>Dev</span>
@@ -342,56 +382,28 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                                     size="small"
                                     checked={useProdVacs}
                                     onChange={setUseProdVacs}
-                                    disabled={!!vacsOauthSessionId}
+                                    disabled={vacsOauthLoading}
                                 />
                                 <span style={{ fontSize: 12, color: '#999' }}>Prod</span>
                             </div>
                         </div>
-                        {vacsOauthSessionId && (
-                            <>
-                                <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>
-                                    2. Authorize on VATSIM, then copy the <code>vacs://</code> URL from the popup address bar and paste it here:
-                                </div>
-                                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                                    <Input
-                                        size="small"
-                                        placeholder="Paste vacs://auth/vatsim/callback?code=...&state=... URL"
-                                        value={vacsCallbackUrl}
-                                        onChange={e => setVacsCallbackUrl(e.target.value)}
-                                        onPressEnter={handleVacsCallback}
-                                        style={{ flex: 1 }}
-                                    />
-                                    <Button
-                                        size="small"
-                                        type="primary"
-                                        disabled={!vacsCallbackUrl.trim()}
-                                        loading={vacsOauthLoading}
-                                        onClick={handleVacsCallback}
-                                    >
-                                        Connect
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                        {!vacsOauthSessionId && (
-                            <div style={{ display: 'flex', gap: 8 }}>
-                                <Input
-                                    size="small"
-                                    placeholder={hasSavedToken ? 'Or paste WS token to update' : 'Or paste WS token directly'}
-                                    value={vacsToken}
-                                    onChange={e => setVacsToken(e.target.value)}
-                                    onPressEnter={handleVacsConnect}
-                                    style={{ flex: 1 }}
-                                />
-                                <Button
-                                    size="small"
-                                    disabled={!vacsToken.trim()}
-                                    onClick={handleVacsConnect}
-                                >
-                                    Connect
-                                </Button>
-                            </div>
-                        )}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <Input
+                                size="small"
+                                placeholder={hasSavedToken ? 'Or paste WS token to update' : 'Or paste WS token directly'}
+                                value={vacsToken}
+                                onChange={e => setVacsToken(e.target.value)}
+                                onPressEnter={handleVacsConnect}
+                                style={{ flex: 1 }}
+                            />
+                            <Button
+                                size="small"
+                                disabled={!vacsToken.trim()}
+                                onClick={handleVacsConnect}
+                            >
+                                Connect
+                            </Button>
+                        </div>
                     </>
                 )}
             </div>
