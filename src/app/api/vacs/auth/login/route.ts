@@ -34,6 +34,16 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json() as { url: string };
 
+    if (!data.url) {
+      console.error('[VACS Auth] No URL returned from', baseUrl, '- response:', JSON.stringify(data));
+      return NextResponse.json(
+        { error: `VACS ${env} server did not return an auth URL` },
+        { status: 502 },
+      );
+    }
+
+    console.log('[VACS Auth] Got auth URL for', env, ':', data.url.substring(0, 80) + '...');
+
     // Capture the VACS session cookie for later use in the exchange step
     const setCookie = response.headers.get('set-cookie');
     const sessionId = vacsSessionStore.save(setCookie || '', baseUrl);

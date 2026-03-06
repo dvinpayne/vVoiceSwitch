@@ -64,6 +64,8 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     const [vacsOauthStatus, setVacsOauthStatus] = useState<string | null>(null)
     const popupRef = useRef<Window | null>(null)
     const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+    const [vacsSessionId, setVacsSessionId] = useState<string | null>(null)
+    const [vacsCallbackUrl, setVacsCallbackUrl] = useState('')
     const [vvscsFacility, setVvscsFacility] = useState('')
     const [vvscsPosition, setVvscsPosition] = useState('')
 
@@ -152,6 +154,8 @@ function SettingModal({ open, setModal }: SettingModalProps) {
             setTimeout(() => {
                 setHasSavedToken(!!loadVacsCredentials());
                 setVacsOauthStatus(null);
+                setVacsSessionId(null);
+                setVacsCallbackUrl('');
             }, 2000);
         } catch (err: any) {
             setVacsOauthStatus('Error: ' + (err.message || 'Network error'));
@@ -172,6 +176,8 @@ function SettingModal({ open, setModal }: SettingModalProps) {
         stopPolling();
         setVacsOauthLoading(true);
         setVacsOauthStatus('Starting login...');
+        setVacsSessionId(null);
+        setVacsCallbackUrl('');
         try {
             const env = useProdVacs ? 'prod' : 'dev';
             const res = await fetch(`/api/vacs/auth/login?env=${env}`);
@@ -182,6 +188,7 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                 return;
             }
             const sessionId = data.sessionId;
+            setVacsSessionId(sessionId);
             setVacsOauthStatus('Waiting for VATSIM authorization...');
 
             // Open popup
@@ -201,7 +208,7 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                     if (!popup || popup.closed) {
                         stopPolling();
                         if (!resolved) {
-                            setVacsOauthStatus(null);
+                            setVacsOauthStatus('Popup closed — paste the callback URL or WS token below');
                             setVacsOauthLoading(false);
                         }
                         return;
@@ -239,6 +246,31 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     useEffect(() => {
         return () => { stopPolling(); };
     }, [stopPolling]);
+
+    /** Paste handler: user pastes the vacs://callback URL manually */
+    const handleVacsCallback = useCallback(() => {
+        const url = vacsCallbackUrl.trim();
+        if (!url || !vacsSessionId) return;
+        let code = '';
+        let state = '';
+        try {
+            const parseable = url.replace(/^vacs:\/\//, 'https://vacs.internal/');
+            const parsed = new URL(parseable);
+            code = parsed.searchParams.get('code') || '';
+            state = parsed.searchParams.get('state') || '';
+        } catch {
+            const codeMatch = url.match(/[?&]code=([^&]+)/);
+            const stateMatch = url.match(/[?&]state=([^&]+)/);
+            code = codeMatch?.[1] || '';
+            state = stateMatch?.[1] || '';
+        }
+        if (code && state) {
+            completeVacsExchange(vacsSessionId, code, state);
+            setVacsCallbackUrl('');
+        } else {
+            setVacsOauthStatus('Error: Could not find code and state in URL');
+        }
+    }, [vacsCallbackUrl, vacsSessionId, completeVacsExchange]);
 
     const handleVvscsConnect = useCallback(() => {
         if (!vvscsFacility.trim() || !vvscsPosition.trim()) return;
@@ -387,6 +419,32 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                                 <span style={{ fontSize: 12, color: '#999' }}>Prod</span>
                             </div>
                         </div>
+                        {vacsSessionId && (
+                            <div style={{ marginBottom: 8 }}>
+                                <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>
+                                    After authorizing, copy the <code>vacs://</code> URL from the popup address bar and paste it here:
+                                </div>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <Input
+                                        size="small"
+                                        placeholder="vacs://auth/vatsim/callback?code=...&state=..."
+                                        value={vacsCallbackUrl}
+                                        onChange={e => setVacsCallbackUrl(e.target.value)}
+                                        onPressEnter={handleVacsCallback}
+                                        style={{ flex: 1 }}
+                                    />
+                                    <Button
+                                        size="small"
+                                        type="primary"
+                                        disabled={!vacsCallbackUrl.trim()}
+                                        loading={vacsOauthLoading}
+                                        onClick={handleVacsCallback}
+                                    >
+                                        Submit
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                         <div style={{ display: 'flex', gap: 8 }}>
                             <Input
                                 size="small"
