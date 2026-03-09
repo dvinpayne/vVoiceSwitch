@@ -2,7 +2,6 @@ import Modal from 'antd/es/modal'
 import Select from 'antd/es/select'
 import Input from 'antd/es/input'
 import Button from 'antd/es/button'
-import Switch from 'antd/es/switch'
 import { useCoreStore, type Facility } from '../model';
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { loadVacsCredentials, clearVacsCredentials } from '../lib/vacs/store';
@@ -57,10 +56,7 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     const [selectedPosition, setSelectedPosition] = useState<Position | null>(null)
     const [vacsToken, setVacsToken] = useState('')
     const [vacsLoggingIn, setVacsLoggingIn] = useState(false)
-    const [useProdVacs, setUseProdVacs] = useState(() => {
-        const saved = loadVacsCredentials();
-        return saved?.useProd ?? false;
-    })
+    const [vacsLoginError, setVacsLoginError] = useState<string | null>(null)
     const [hasSavedToken, setHasSavedToken] = useState(() => !!loadVacsCredentials())
     const [vvscsFacility, setVvscsFacility] = useState('')
     const [vvscsPosition, setVvscsPosition] = useState('')
@@ -84,15 +80,17 @@ function SettingModal({ open, setModal }: SettingModalProps) {
             if (!data.wsToken && !data.error) return;
 
             setVacsLoggingIn(false);
+            setVacsLoginError(null);
 
             if (data.success && data.wsToken) {
                 console.log('[Settings] VACS OAuth success, CID:', data.cid);
                 const positionId = callsign || undefined;
-                const isProd = data.env === 'prod';
-                connectVacs(data.wsToken, positionId, isProd);
+                connectVacs(data.wsToken, positionId, false);
                 setTimeout(() => setHasSavedToken(!!loadVacsCredentials()), 3000);
             } else {
-                console.error('[Settings] VACS OAuth failed:', data.error);
+                const msg = data.error || 'VACS authentication failed';
+                console.error('[Settings] VACS OAuth failed:', msg);
+                setVacsLoginError(msg);
             }
         };
 
@@ -103,13 +101,15 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     /** Login with VATSIM via OAuth2 popup */
     const handleVatsimLogin = useCallback(async () => {
         setVacsLoggingIn(true);
+        setVacsLoginError(null);
         try {
-            const env = useProdVacs ? 'prod' : 'dev';
-            const res = await fetch(`/api/vacs/auth/vatsim-login?env=${env}`);
+            const res = await fetch('/api/vacs/auth/vatsim-login?env=dev');
             const data = await res.json();
 
             if (!data.url) {
-                console.error('[Settings] No auth URL returned:', data.error);
+                const msg = data.error || 'Failed to start VATSIM login';
+                console.error('[Settings] No auth URL returned:', msg);
+                setVacsLoginError(msg);
                 setVacsLoggingIn(false);
                 return;
             }
@@ -131,10 +131,12 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                 }
             }, 500);
         } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Unknown error';
             console.error('[Settings] VATSIM login error:', err);
+            setVacsLoginError(msg);
             setVacsLoggingIn(false);
         }
-    }, [useProdVacs]);
+    }, []);
 
     // Build facility options from top-level childFacilities
     const facilities = useMemo(() => {
@@ -180,11 +182,12 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     /** Connect with a VATSIM access token (exchanges for WS token automatically) */
     const handleVacsConnect = useCallback(async () => {
         if (!vacsToken.trim()) return;
+        setVacsLoginError(null);
         const positionId = callsign || undefined;
-        await connectVacsWithVatsimToken(vacsToken.trim(), positionId, useProdVacs);
+        await connectVacsWithVatsimToken(vacsToken.trim(), positionId, false);
         setVacsToken('');
         setTimeout(() => setHasSavedToken(!!loadVacsCredentials()), 3000);
-    }, [vacsToken, callsign, connectVacsWithVatsimToken, useProdVacs]);
+    }, [vacsToken, callsign, connectVacsWithVatsimToken]);
 
     /** Clear saved VACS token from localStorage */
     const handleClearSavedToken = useCallback(() => {
@@ -309,17 +312,11 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                                 </Button>
                             </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <span style={{ fontSize: 12, color: '#999' }}>Dev</span>
-                                <Switch
-                                    size="small"
-                                    checked={useProdVacs}
-                                    onChange={setUseProdVacs}
-                                />
-                                <span style={{ fontSize: 12, color: '#999' }}>Prod</span>
+                        {vacsLoginError && (
+                            <div style={{ fontSize: 12, color: '#ff4d4f', marginBottom: 8 }}>
+                                {vacsLoginError}
                             </div>
-                        </div>
+                        )}
                         <Button
                             type="primary"
                             size="small"
