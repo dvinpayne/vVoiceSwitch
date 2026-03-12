@@ -1993,7 +1993,9 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const [lowFreq, highFreq] = freqs;
-      const duration = 0.15; // 150ms tone
+      const duration = 0.25; // 250ms tone
+      const now = audioContext.currentTime;
+      const endTime = now + duration;
 
       // Create oscillators for dual-tone
       const osc1 = audioContext.createOscillator();
@@ -2005,16 +2007,17 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
       osc1.type = 'sine';
       osc2.type = 'sine';
 
-      gainNode.gain.value = 0.2; // Moderate volume
+      gainNode.gain.setValueAtTime(0.15, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, endTime);
 
       osc1.connect(gainNode);
       osc2.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      osc1.start();
-      osc2.start();
-      osc1.stop(audioContext.currentTime + duration);
-      osc2.stop(audioContext.currentTime + duration);
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(endTime);
+      osc2.stop(endTime);
 
       // Cleanup
       setTimeout(() => audioContext.close(), duration * 1000 + 100);

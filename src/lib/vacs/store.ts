@@ -27,22 +27,27 @@ import { VACS_DEV_CONFIG, VACS_PROD_CONFIG } from './types';
 // ─── localStorage keys for token persistence ─────────────────────────────────
 const LS_VACS_TOKEN = 'vacs_token';
 const LS_VACS_USE_PROD = 'vacs_use_prod';
+const LS_VACS_VATSIM_TOKEN = 'vacs_vatsim_token';
 
 /** Save VACS credentials to localStorage for auto-reconnect */
-function persistVacsCredentials(token: string, useProd: boolean): void {
+function persistVacsCredentials(token: string, useProd: boolean, vatsimToken?: string): void {
   try {
     localStorage.setItem(LS_VACS_TOKEN, token);
     localStorage.setItem(LS_VACS_USE_PROD, useProd ? '1' : '0');
+    if (vatsimToken) {
+      localStorage.setItem(LS_VACS_VATSIM_TOKEN, vatsimToken);
+    }
   } catch { /* SSR or quota exceeded – ignore */ }
 }
 
 /** Load saved VACS credentials from localStorage */
-export function loadVacsCredentials(): { token: string; useProd: boolean } | null {
+export function loadVacsCredentials(): { token: string; useProd: boolean; vatsimToken?: string } | null {
   try {
     const token = localStorage.getItem(LS_VACS_TOKEN);
     if (!token) return null;
     const useProd = localStorage.getItem(LS_VACS_USE_PROD) === '1';
-    return { token, useProd };
+    const vatsimToken = localStorage.getItem(LS_VACS_VATSIM_TOKEN) || undefined;
+    return { token, useProd, vatsimToken };
   } catch {
     return null;
   }
@@ -53,6 +58,7 @@ export function clearVacsCredentials(): void {
   try {
     localStorage.removeItem(LS_VACS_TOKEN);
     localStorage.removeItem(LS_VACS_USE_PROD);
+    localStorage.removeItem(LS_VACS_VATSIM_TOKEN);
   } catch { /* ignore */ }
 }
 
@@ -107,6 +113,8 @@ class VacsStore {
   private lastToken: string | null = null;
   /** Whether the current/last connection used production */
   private lastUseProd = false;
+  /** VATSIM access token used for the current connection (for re-auth on reconnect) */
+  private lastVatsimToken: string | null = null;
 
   /** Bind to the zustand store's set/get functions */
   bindStore(set: (partial: any) => void, get: () => any): void {
@@ -158,6 +166,56 @@ class VacsStore {
     this.client.connect(token, positionId?.toUpperCase());
   }
 
+  /**
+   * Connect to VACS using a VATSIM access token.
+   * Exchanges the VATSIM token for a VACS API token, then a WS token,
+   * then connects the WebSocket signaling client.
+   *
+   * @param vatsimToken - VATSIM Connect access token
+   * @param positionId - VATSIM position (e.g. "ZOA_33_CTR")
+   * @param useProd - Use production server (default: false = dev/sandbox)
+   */
+  async connectVacsWithVatsimToken(vatsimToken: string, positionId?: PositionId, useProd = false): Promise<void> {
+    this.lastVatsimToken = vatsimToken;
+    this.lastUseProd = useProd;
+    this.updateState({ vacsStatus: 'authenticating', vacsError: null });
+
+    try {
+      const res = await fetch('/api/vacs/auth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vatsimToken,
+          env: useProd ? 'prod' : 'dev',
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        const errorMsg = data.error || `Auth failed (${res.status})`;
+        this.updateState({ vacsStatus: 'disconnected', vacsError: errorMsg });
+        return;
+      }
+
+      const data = await res.json() as { token: string; cid?: string };
+      if (!data.token) {
+        this.updateState({ vacsStatus: 'disconnected', vacsError: 'No WS token returned' });
+        return;
+      }
+
+      console.log('[VACS Store] Token exchange successful, CID:', data.cid);
+
+      // Now connect with the obtained WS token
+      this.connectVacs(data.token, positionId, useProd);
+      // Overwrite lastVatsimToken so persistence saves it
+      this.lastVatsimToken = vatsimToken;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Token exchange failed';
+      this.updateState({ vacsStatus: 'disconnected', vacsError: errorMsg });
+      console.error('[VACS Store] Token exchange error:', err);
+    }
+  }
+
   /** Disconnect from VACS and clear saved credentials */
   disconnectVacs(): void {
     if (this.client) {
@@ -166,6 +224,7 @@ class VacsStore {
       this.client = null;
     }
     this.lastToken = null;
+    this.lastVatsimToken = null;
     clearVacsCredentials();
     this.updateState({
       ...INITIAL_VACS_STATE,
@@ -354,7 +413,7 @@ class VacsStore {
         });
         // Persist token on successful auth so we can auto-reconnect later
         if (this.lastToken) {
-          persistVacsCredentials(this.lastToken, this.lastUseProd);
+          persistVacsCredentials(this.lastToken, this.lastUseProd, this.lastVatsimToken || undefined);
           console.log('[VACS Store] Token saved to localStorage for auto-reconnect');
         }
         console.log('[VACS Store] Connected:', event.clientInfo.displayName);

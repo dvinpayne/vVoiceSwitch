@@ -36,10 +36,14 @@ export async function POST(request: NextRequest) {
     }
 
     const { cookie, baseUrl } = session;
+    console.log('[VACS Auth Complete] Session found — cookie length:', cookie.length, '- baseUrl:', baseUrl);
+    if (!cookie) {
+      console.error('[VACS Auth Complete] WARNING: stored cookie is empty!');
+    }
 
     // ── Step 1: Exchange the OAuth code for a VACS session ──────────────
 
-    console.log('[VACS Auth Complete] Exchanging code with', baseUrl);
+    console.log('[VACS Auth Complete] Exchanging code with', baseUrl, '- code:', code.substring(0, 10) + '...', '- state:', state.substring(0, 10) + '...');
     const exchangeRes = await fetch(`${baseUrl}/auth/vatsim/exchange`, {
       method: 'POST',
       headers: {
@@ -61,8 +65,15 @@ export async function POST(request: NextRequest) {
     }
 
     // The exchange step may set new/updated cookies
-    const exchangeCookies = exchangeRes.headers.get('set-cookie');
+    let exchangeCookies: string;
+    try {
+      const cookies = (exchangeRes.headers as any).getSetCookie?.() as string[] | undefined;
+      exchangeCookies = cookies?.join('; ') || exchangeRes.headers.get('set-cookie') || '';
+    } catch {
+      exchangeCookies = exchangeRes.headers.get('set-cookie') || '';
+    }
     const sessionCookie = exchangeCookies || cookie;
+    console.log('[VACS Auth Complete] Exchange success — new cookie:', exchangeCookies ? 'yes' : 'no (using original)');
 
     // ── Step 2: Fetch the WebSocket token using the authenticated session ─
 

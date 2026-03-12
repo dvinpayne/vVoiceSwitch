@@ -45,8 +45,24 @@ export async function GET(request: NextRequest) {
     console.log('[VACS Auth] Got auth URL for', env, ':', data.url.substring(0, 80) + '...');
 
     // Capture the VACS session cookie for later use in the exchange step
-    const setCookie = response.headers.get('set-cookie');
-    const sessionId = vacsSessionStore.save(setCookie || '', baseUrl);
+    // Use getSetCookie() (Node 18.14+) for proper multi-cookie support,
+    // fall back to get('set-cookie') for older runtimes
+    let rawCookies: string;
+    try {
+      const cookies = (response.headers as any).getSetCookie?.() as string[] | undefined;
+      rawCookies = cookies?.join('; ') || response.headers.get('set-cookie') || '';
+    } catch {
+      rawCookies = response.headers.get('set-cookie') || '';
+    }
+    console.log('[VACS Auth] Captured cookie:', rawCookies ? rawCookies.substring(0, 80) + '...' : '(none)');
+    if (!rawCookies) {
+      console.warn('[VACS Auth] WARNING: No session cookie captured from VACS server!');
+      // Dump all response headers for debugging
+      const hdrs: Record<string, string> = {};
+      response.headers.forEach((v, k) => { hdrs[k] = v; });
+      console.warn('[VACS Auth] Response headers:', JSON.stringify(hdrs));
+    }
+    const sessionId = vacsSessionStore.save(rawCookies, baseUrl);
 
     return NextResponse.json({ url: data.url, sessionId });
   } catch (error) {

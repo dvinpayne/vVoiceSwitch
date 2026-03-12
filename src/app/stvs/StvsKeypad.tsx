@@ -52,7 +52,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
   }, []);
   
   // Play DTMF tone
-  const playDTMF = useCallback((key: string, duration: number = 150) => {
+  const playDTMF = useCallback((key: string, duration: number = 250) => {
     const frequencies = DTMF_FREQUENCIES[key];
     if (!frequencies) return;
     

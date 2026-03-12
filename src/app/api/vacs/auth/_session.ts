@@ -6,11 +6,13 @@
  * replay it later during the /auth/vatsim/exchange and /ws/token steps.
  *
  * Sessions expire after 10 minutes (the OAuth flow should complete quickly).
+ *
+ * Uses globalThis to survive Next.js hot-module-replacement in dev mode.
  */
 
 import { randomBytes } from 'crypto';
 
-interface StoredSession {
+export interface StoredSession {
   cookie: string;
   baseUrl: string;
   createdAt: number;
@@ -19,20 +21,27 @@ interface StoredSession {
 const SESSION_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 class VacsSessionStore {
-  private sessions = new Map<string, StoredSession>();
+  private sessions: Map<string, StoredSession>;
+
+  constructor(sessions: Map<string, StoredSession>) {
+    this.sessions = sessions;
+  }
 
   /** Save a VACS session cookie and return a sessionId */
   save(cookie: string, baseUrl: string): string {
     this.cleanup();
     const sessionId = randomBytes(16).toString('hex');
     this.sessions.set(sessionId, { cookie, baseUrl, createdAt: Date.now() });
+    console.log('[VACS Session] Saved session', sessionId.substring(0, 8), '- cookie length:', cookie.length, '- total sessions:', this.sessions.size);
     return sessionId;
   }
 
-  /** Retrieve and optionally update a stored session */
+  /** Retrieve a stored session */
   get(sessionId: string): StoredSession | null {
     this.cleanup();
-    return this.sessions.get(sessionId) ?? null;
+    const session = this.sessions.get(sessionId) ?? null;
+    console.log('[VACS Session] Get', sessionId.substring(0, 8), session ? 'FOUND' : 'NOT FOUND', '- total sessions:', this.sessions.size);
+    return session;
   }
 
   /** Update the cookie for an existing session (after exchange sets new cookies) */
@@ -59,5 +68,14 @@ class VacsSessionStore {
   }
 }
 
-/** Singleton session store (lives in server memory) */
-export const vacsSessionStore = new VacsSessionStore();
+/**
+ * Singleton session store — survives Next.js HMR in dev.
+ * In dev mode, module re-evaluation creates new Map instances,
+ * losing all sessions. globalThis persists across HMR cycles.
+ */
+const globalKey = '__vacsSessionStore' as const;
+const g = globalThis as unknown as { [globalKey]: Map<string, StoredSession> | undefined };
+if (!g[globalKey]) {
+  g[globalKey] = new Map<string, StoredSession>();
+}
+export const vacsSessionStore = new VacsSessionStore(g[globalKey]!);

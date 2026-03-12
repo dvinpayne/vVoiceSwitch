@@ -175,6 +175,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState {
 
     // VACS integration
     connectVacs: (token: string, positionId?: string, useProd?: boolean) => void;
+    connectVacsWithVatsimToken: (vatsimToken: string, positionId?: string, useProd?: boolean) => Promise<void>;
     disconnectVacs: () => void;
     vacsCallStation: (stationId: string, prio?: boolean) => string | null;
     vacsCallPosition: (positionId: string, prio?: boolean) => string | null;
@@ -656,6 +657,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         connectVacs: (token: string, positionId?: string, useProd?: boolean) => {
             vacsStore.connectVacs(token, positionId, useProd);
         },
+        connectVacsWithVatsimToken: async (vatsimToken: string, positionId?: string, useProd?: boolean) => {
+            await vacsStore.connectVacsWithVatsimToken(vatsimToken, positionId, useProd);
+        },
         disconnectVacs: () => {
             vacsStore.disconnectVacs();
         },
@@ -895,8 +899,15 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             const saved = loadVacsCredentials();
             if (saved) {
                 const positionId = callsign || undefined;
-                console.log('[resetWindow] Auto-connecting to VACS with saved token (prod=' + saved.useProd + ')');
-                vacsStore.connectVacs(saved.token, positionId, saved.useProd);
+                if (saved.vatsimToken) {
+                    // Re-exchange VATSIM token for a fresh WS token
+                    console.log('[resetWindow] Auto-connecting to VACS with saved VATSIM token (prod=' + saved.useProd + ')');
+                    vacsStore.connectVacsWithVatsimToken(saved.vatsimToken, positionId, saved.useProd);
+                } else {
+                    // Fall back to direct WS token (may be expired)
+                    console.log('[resetWindow] Auto-connecting to VACS with saved WS token (prod=' + saved.useProd + ')');
+                    vacsStore.connectVacs(saved.token, positionId, saved.useProd);
+                }
             }
         }
 
